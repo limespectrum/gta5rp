@@ -598,6 +598,146 @@ html.dark input[type="checkbox"]:hover {
   font-size: 1.8rem;
   transition: all 0.2s ease;
 }
+  /* ========== ПЕРЕКЛЮЧАТЕЛИ (IOS‑стиль) И КНОПКА СБРОСА + ДАТА ========== */
+
+/* Кнопка Сброс — крупнее и с иконкой */
+#resetBtn {
+  font-size: 1.1rem;
+  padding: 12px 28px;
+  border-radius: 40px;
+  background: rgba(255, 80, 80, 0.12);
+  border-color: #ff5555;
+  color: #ff8888;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+#resetBtn::before {
+  content: "⟳";
+  font-size: 1.3rem;
+  font-weight: normal;
+}
+#resetBtn:hover {
+  background: rgba(255, 80, 80, 0.25);
+  box-shadow: 0 0 12px #ff5555;
+  transform: translateY(-2px);
+}
+
+/* Переключатели — превращаем .tog в iOS‑тумблер */
+.controls .tog {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 8px 0;
+  user-select: none;
+}
+.controls .tog span.small {
+  font-size: 1rem;
+  font-weight: 600;
+  color: inherit;
+  margin-right: 4px;
+}
+/* Скрываем стандартный чекбокс, создаём свой */
+.controls .tog input {
+  position: relative;
+  width: 52px;
+  height: 28px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+/* Создаём фон переключателя */
+.controls .tog {
+  position: relative;
+}
+.controls .tog::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 52px;
+  height: 28px;
+  background-color: #555;
+  border-radius: 34px;
+  transition: background-color 0.2s;
+  pointer-events: none;
+  box-shadow: inset 0 0 2px rgba(0,0,0,0.3);
+}
+/* Кружок переключателя */
+.controls .tog::after {
+  content: "";
+  position: absolute;
+  right: 26px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.2s, right 0.2s;
+  pointer-events: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+/* Состояние checked — зелёный для VIP, синий для x2 */
+.controls .tog:has(input:checked)::before {
+  background-color: #34c759; /* зелёный iOS */
+}
+.controls .tog:has(input:checked)::after {
+  right: 4px;
+}
+/* Для x2 — отдельный цвет (если хотите разный) */
+.controls .tog:has(#x2Checkbox:checked)::before {
+  background-color: #0a84ff; /* системно‑синий */
+}
+/* Тёмная тема — фон переключателя светлее */
+html.dark .controls .tog::before {
+  background-color: #3a3a44;
+}
+html.dark .controls .tog:has(input:checked)::before {
+  background-color: #30d158; /* ярко‑зелёный в тёмной теме */
+}
+html.dark .controls .tog:has(#x2Checkbox:checked)::before {
+  background-color: #0a84ff;
+}
+
+/* Блок даты */
+.date-display {
+  font-family: 'Orbitron', monospace;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(6px);
+  padding: 8px 18px;
+  border-radius: 40px;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  border: 1px solid rgba(0,255,255,0.4);
+  color: #bbf0ff;
+  white-space: nowrap;
+  margin-left: auto;
+  margin-right: 20px;
+}
+html.dark .date-display {
+  color: #ccf4ff;
+  border-color: #0ff;
+}
+@media (max-width: 700px) {
+  .date-display {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    text-align: center;
+    order: 5;
+  }
+  .controls {
+    justify-content: center;
+  }
+}
 </style>
 </head>
 <body class="vip-mode x2-mode">
