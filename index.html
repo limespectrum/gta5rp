@@ -82,9 +82,9 @@
     cursor: default;
   }
   .controls { display:flex; gap:12px; align-items:center; flex-wrap:wrap; background: rgba(10,20,40,0.75); backdrop-filter: blur(12px); border: 1px solid rgba(0,255,255,0.4); border-radius: 60px; padding: 12px 24px; margin-bottom: 24px; box-shadow: 0 0 15px rgba(0,255,255,0.2); }
-  .controls button:not(.char-btn) { background: linear-gradient(135deg, #ff3366, #cc0044); border: none; color: white; padding: 10px 24px; border-radius: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 0 6px #ff3366; user-select: none; }
-  .controls button:not(.char-btn):hover { transform: scale(1.05); box-shadow: 0 0 18px #ff3366; background: linear-gradient(135deg, #ff5577, #ee2255); }
-  .center-actions { display: flex; align-items: center; gap: 20px; width: 100%; }
+  .controls button { background: linear-gradient(135deg, #ff3366, #cc0044); border: none; color: white; padding: 10px 24px; border-radius: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 0 6px #ff3366; user-select: none; }
+  .controls button:hover { transform: scale(1.05); box-shadow: 0 0 18px #ff3366; background: linear-gradient(135deg, #ff5577, #ee2255); }
+  .center-actions { display: flex; align-items: center; gap: 20px; margin: 0 auto; }
   /* === VIP & X2 TOGGLE BUTTONS === */
   .toggle-switch { display: inline-flex; align-items: center; gap: 0; cursor: pointer; }
   .toggle-switch input { display: none; }
@@ -182,26 +182,26 @@
     font-weight: 700;
     letter-spacing: 0.4px;
     cursor: pointer;
-    user-select: none;
     border: 1.5px solid rgba(255,255,255,0.12);
     background: rgba(255,255,255,0.04);
     color: rgba(150,160,180,0.5);
     transition: all 0.2s ease;
     text-decoration: line-through;
     text-decoration-color: rgba(150,160,180,0.3);
+    user-select: none;
   }
   .filter-btn:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.25);
+    color: rgba(200,210,230,0.7);
     transform: scale(1.05);
-    background: rgba(255,255,255,0.10);
-    border-color: rgba(255,255,255,0.35);
-    color: rgba(220,230,255,0.85);
-    box-shadow: 0 0 14px rgba(255,255,255,0.12);
   }
-  .filter-btn.active[data-col="col-easy"]:hover    { box-shadow: 0 0 18px rgba(74,222,128,0.45); }
-  .filter-btn.active[data-col="col-medium"]:hover  { box-shadow: 0 0 18px rgba(251,191,36,0.45); }
-  .filter-btn.active[data-col="col-joint"]:hover   { box-shadow: 0 0 18px rgba(96,165,250,0.45); }
-  .filter-btn.active[data-col="col-avoid"]:hover   { box-shadow: 0 0 18px rgba(148,163,184,0.35); }
-  .filter-btn.active[data-col="col-fraction"]:hover{ box-shadow: 0 0 18px rgba(192,132,252,0.45); }
+  /* Hover по цвету каждой категории */
+  .filter-btn[data-col="col-easy"]:hover    { background: rgba(74,222,128,0.12); border-color: rgba(74,222,128,0.45); color: rgba(74,222,128,0.75); box-shadow: 0 0 12px rgba(74,222,128,0.2); }
+  .filter-btn[data-col="col-medium"]:hover  { background: rgba(251,191,36,0.12); border-color: rgba(251,191,36,0.45); color: rgba(251,191,36,0.75); box-shadow: 0 0 12px rgba(251,191,36,0.2); }
+  .filter-btn[data-col="col-joint"]:hover   { background: rgba(96,165,250,0.12); border-color: rgba(96,165,250,0.45); color: rgba(96,165,250,0.75); box-shadow: 0 0 12px rgba(96,165,250,0.2); }
+  .filter-btn[data-col="col-avoid"]:hover   { background: rgba(148,163,184,0.12); border-color: rgba(148,163,184,0.45); color: rgba(148,163,184,0.75); box-shadow: 0 0 12px rgba(148,163,184,0.2); }
+  .filter-btn[data-col="col-fraction"]:hover{ background: rgba(192,132,252,0.12); border-color: rgba(192,132,252,0.45); color: rgba(192,132,252,0.75); box-shadow: 0 0 12px rgba(192,132,252,0.2); }
   .filter-btn.active {
     text-decoration: none;
   }
@@ -210,117 +210,12 @@
   .filter-btn.active[data-col="col-joint"]   { background: rgba(96,165,250,0.15); border-color: rgba(96,165,250,0.6); color: #60a5fa; box-shadow: 0 0 10px rgba(96,165,250,0.2); }
   .filter-btn.active[data-col="col-avoid"]   { background: rgba(148,163,184,0.15); border-color: rgba(148,163,184,0.5); color: #94a3b8; box-shadow: 0 0 10px rgba(148,163,184,0.15); }
   .filter-btn.active[data-col="col-fraction"]{ background: rgba(192,132,252,0.15); border-color: rgba(192,132,252,0.6); color: #c084fc; box-shadow: 0 0 10px rgba(192,132,252,0.2); }
-
-  /* === CHARACTER SWITCHER === */
-  .char-switcher {
-    display: inline-flex;
-    gap: 8px;
-    background: transparent;
-    border-radius: 0;
-    padding: 0;
-    border: none;
-  }
-  .char-btn {
-    display: inline-flex;
-    align-items: center;
-    padding: 10px 22px;
-    border-radius: 40px;
-    border: 2px solid rgba(120,130,160,0.3);
-    background: rgba(40,55,85,0.5);
-    color: rgba(120,130,160,0.55);
-    cursor: pointer;
-    user-select: none;
-    -webkit-user-select: none;
-    font-weight: 700;
-    font-size: 0.88rem;
-    letter-spacing: 0.5px;
-    transition: all 0.22s ease;
-  }
-  .char-btn .char-icon { display: none; user-select: none; -webkit-user-select: none; }
-  .char-btn .char-label { font-size: 0.88rem; user-select: none; -webkit-user-select: none; pointer-events: none; }
-  .char-btn:hover {
-    transform: scale(1.05);
-    border-color: rgba(160,180,220,0.5);
-    color: rgba(200,210,240,0.8);
-  }
-  .char-btn.active {
-    background: linear-gradient(135deg, rgba(0,200,255,0.18), rgba(80,0,255,0.14));
-    border-color: rgba(0,220,255,0.7);
-    color: #7df0ff;
-    box-shadow: 0 0 12px rgba(0,220,255,0.45), 0 0 24px rgba(0,200,255,0.2), inset 0 0 8px rgba(0,200,255,0.08);
-    animation: charPulse 2.2s ease-in-out infinite alternate;
-  }
-  @keyframes charPulse {
-    0%  { box-shadow: 0 0 10px rgba(0,220,255,0.35), 0 0 20px rgba(0,200,255,0.18), inset 0 0 6px rgba(0,200,255,0.06); }
-    100%{ box-shadow: 0 0 22px rgba(0,220,255,0.65), 0 0 40px rgba(0,200,255,0.3), inset 0 0 12px rgba(0,200,255,0.12); }
-  }
-  /* Полоска активного персонажа под шапкой */
-  .char-indicator {
-    text-align: center;
-    margin: -14px 0 12px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #7df0ff;
-    text-shadow: 0 0 10px rgba(0,220,255,0.6);
-    opacity: 0.85;
-    transition: all 0.3s;
-  }
-
-  /* Персонаж 2 — зелёная токсичная подсветка */
-  body.char2-active .char-btn#charBtn2.active {
-    background: linear-gradient(135deg, rgba(57,255,100,0.18), rgba(0,200,60,0.14));
-    border-color: rgba(57,255,100,0.75);
-    color: #39ff6a;
-    box-shadow: 0 0 12px rgba(57,255,100,0.55), 0 0 24px rgba(0,255,80,0.28), inset 0 0 8px rgba(57,255,100,0.12);
-    animation: greenCharPulse 2.2s ease-in-out infinite alternate;
-  }
-  @keyframes greenCharPulse {
-    0%  { box-shadow: 0 0 10px rgba(57,255,100,0.4), 0 0 20px rgba(0,255,80,0.2), inset 0 0 6px rgba(57,255,100,0.08); }
-    100%{ box-shadow: 0 0 22px rgba(57,255,100,0.72), 0 0 40px rgba(0,255,80,0.38), inset 0 0 12px rgba(57,255,100,0.16); }
-  }
-  body.char2-active .char-indicator {
-    color: #39ff6a;
-    text-shadow: 0 0 10px rgba(57,255,100,0.8), 0 0 22px rgba(0,255,80,0.5);
-  }
-  body.char2-active .controls {
-    border-color: rgba(57,255,100,0.45);
-    box-shadow: 0 0 18px rgba(57,255,100,0.2), 0 0 40px rgba(0,255,80,0.08);
-  }
-  body.char2-active .legend {
-    border-color: rgba(57,255,100,0.4);
-    box-shadow: 0 0 14px rgba(57,255,100,0.15);
-  }
-  /* Зелёная токсичная шапка для персонажа 2 */
-  body.char2-active .title-capsule-inner {
-    box-shadow:
-      0 0 0 1.5px rgba(57,255,100,0.5),
-      0 0 30px rgba(57,255,100,0.2),
-      0 0 60px rgba(0,255,80,0.12),
-      inset 0 1px 0 rgba(255,255,255,0.06);
-  }
-  body.char2-active .title-capsule-inner::before {
-    background: linear-gradient(135deg, #39ff6a 0%, #00ff55 40%, #aaff00 80%, #ccff00 100%);
-    opacity: 0.55;
-  }
-  body.char2-active .title-main {
-    background: linear-gradient(135deg, #39ff6a, #00ff99, #aaff00, #ccff44);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    filter: drop-shadow(0 0 10px rgba(57,255,100,0.7)) drop-shadow(0 0 20px rgba(0,255,80,0.4));
-  }
-  body.char2-active .title-sub {
-    color: rgba(100,255,160,0.6);
-  }
-  @keyframes greenToxicPulse {
-    0%   { box-shadow: 0 0 0 1.5px rgba(57,255,100,0.35), 0 0 25px rgba(57,255,100,0.18), 0 0 50px rgba(0,255,80,0.08), inset 0 1px 0 rgba(255,255,255,0.06); }
-    100% { box-shadow: 0 0 0 1.5px rgba(57,255,100,0.65), 0 0 50px rgba(57,255,100,0.35), 0 0 90px rgba(0,255,80,0.18), inset 0 1px 0 rgba(255,255,255,0.08); }
-  }
-  body.char2-active .title-capsule-inner {
-    animation: greenToxicPulse 3s ease-in-out infinite alternate;
-  }
+  /* Hover поверх активного состояния */
+  .filter-btn.active[data-col="col-easy"]:hover    { background: rgba(74,222,128,0.25); box-shadow: 0 0 18px rgba(74,222,128,0.4); }
+  .filter-btn.active[data-col="col-medium"]:hover  { background: rgba(251,191,36,0.25); box-shadow: 0 0 18px rgba(251,191,36,0.4); }
+  .filter-btn.active[data-col="col-joint"]:hover   { background: rgba(96,165,250,0.25); box-shadow: 0 0 18px rgba(96,165,250,0.4); }
+  .filter-btn.active[data-col="col-avoid"]:hover   { background: rgba(148,163,184,0.25); box-shadow: 0 0 18px rgba(148,163,184,0.35); }
+  .filter-btn.active[data-col="col-fraction"]:hover{ background: rgba(192,132,252,0.25); box-shadow: 0 0 18px rgba(192,132,252,0.4); }
 
   .column.hidden {
     display: none;
@@ -927,7 +822,7 @@ body.vip-mode.x2-mode .online-bubble .online-cb {
   </div>
 </div>
 
-<div class="controls" style="position:relative;">
+<div class="controls">
   <div class="center-actions">
     <button id="resetBtn">⟳ Сбросить задания</button>
     <label class="toggle-switch">
@@ -940,30 +835,16 @@ body.vip-mode.x2-mode .online-bubble .online-cb {
       <span class="switch-slider"></span>
       <span class="toggle-btn toggle-btn-x2">✨ Акции x2</span>
     </label>
-    <div class="date-display" id="currentDate" style="position:absolute; left:50%; transform:translateX(-50%); pointer-events:none;">—</div>
-    <div style="display:flex; align-items:center; margin-left:auto;">
-      <div class="char-switcher">
-        <button class="char-btn active" id="charBtn1" onclick="switchChar(1)">
-          <span class="char-icon">⚔️</span>
-          <span class="char-label">Персонаж 1</span>
-        </button>
-        <button class="char-btn" id="charBtn2" onclick="switchChar(2)">
-          <span class="char-icon">🛡️</span>
-          <span class="char-label">Персонаж 2</span>
-        </button>
-      </div>
-    </div>
+    <div class="date-display" id="currentDate">—</div>
   </div>
 </div>
 
-<div class="char-indicator" id="charIndicator">⚔️ &nbsp;Персонаж 1</div>
-
 <div class="legend">
-  <button class="filter-btn active" data-col="col-easy">🟢 ЛЁГКИЕ</button>
-  <button class="filter-btn active" data-col="col-medium">🟡 СРЕДНИЕ</button>
-  <button class="filter-btn active" data-col="col-joint">🔵 СОВМЕСТНЫЕ</button>
-  <button class="filter-btn active" data-col="col-avoid">⚪ СЛОЖНЫЕ</button>
-  <button class="filter-btn active" data-col="col-fraction">🟣 ФРАКЦИОННЫЕ</button>
+  <button class="filter-btn active" data-col="col-easy">🟢 Лёгкие</button>
+  <button class="filter-btn active" data-col="col-medium">🟡 Средние</button>
+  <button class="filter-btn active" data-col="col-joint">🔵 Совместные</button>
+  <button class="filter-btn active" data-col="col-avoid">⚪ Сложные</button>
+  <button class="filter-btn active" data-col="col-fraction">🟣 Фракционные</button>
 </div>
 
 <div class="total">
@@ -1108,16 +989,37 @@ body.vip-mode.x2-mode .online-bubble .online-cb {
 
 <script>
 (function(){
-  // Autosave только для VIP и x2 чекбоксов — задачи управляются системой персонажей
   const PREFIX = 'autosave::' + location.origin + '::';
-  const SELECTOR = 'input#vipCheckbox, input#x2Checkbox';
-  function keyFor(el){ return PREFIX + '#' + el.id; }
-  function getValue(el){ return el.checked ? '1' : '0'; }
-  // Не делаем restoreAll — это теперь делает loadState() с учётом персонажа
+  const SELECTOR = 'input, textarea, select';
+  function keyFor(el){
+    if (el.dataset && el.dataset.save) return PREFIX + el.dataset.save;
+    if (el.id) return PREFIX + ('#' + el.id);
+    if (el.name) return PREFIX + ('name:' + el.name);
+    let path = el.tagName.toLowerCase();
+    if (el.type) path += '[' + el.type + ']';
+    return PREFIX + path + ':' + Array.from(document.querySelectorAll(SELECTOR)).indexOf(el);
+  }
+  function getValue(el){ return (el.type==='checkbox'||el.type==='radio') ? (el.checked?'1':'0') : el.value; }
+  function setValue(el, val){
+    if (el.type==='checkbox'||el.type==='radio') el.checked = (val==='1');
+    else el.value = val;
+    el.dispatchEvent(new Event('change',{bubbles:true}));
+    el.dispatchEvent(new Event('input',{bubbles:true}));
+  }
+  function restoreAll(){
+    Array.from(document.querySelectorAll(SELECTOR)).forEach(el=>{
+      const raw = localStorage.getItem(keyFor(el));
+      if (raw !== null) setValue(el, raw);
+    });
+  }
   function bindAutosave(){
+    document.addEventListener('input', e=>{ const el=e.target; if(!el.matches(SELECTOR))return; try{localStorage.setItem(keyFor(el), getValue(el));}catch(_){} }, {passive:true});
     document.addEventListener('change', e=>{ const el=e.target; if(!el.matches(SELECTOR))return; try{localStorage.setItem(keyFor(el), getValue(el));}catch(_){} }, {passive:true});
   }
-  bindAutosave();
+  restoreAll(); bindAutosave();
+  document.getElementById('resetBtn')?.addEventListener('click', ()=>{
+    Object.keys(localStorage).forEach(k=>{ if(k.startsWith(PREFIX)) localStorage.removeItem(k); });
+  });
 })();
 </script>
 
@@ -1125,46 +1027,6 @@ body.vip-mode.x2-mode .online-bubble .online-cb {
 const storageKey = 'daily_tasks_done_v4_grid';
 const vipStorageKey = 'daily_tasks_vip_mode_v4';
 const x2StorageKey = 'daily_tasks_x2_mode_v4';
-
-// === ПЕРСОНАЖИ ===
-let currentChar = parseInt(localStorage.getItem('active_char') || '1');
-
-function charSuffix(n) { return n === 1 ? '' : '_char2'; }
-function getStorageKey()    { return storageKey + charSuffix(currentChar); }
-function getVipStorageKey() { return vipStorageKey + charSuffix(currentChar); }
-function getX2StorageKey()  { return x2StorageKey + charSuffix(currentChar); }
-
-function switchChar(n) {
-  if (n === currentChar) return;
-  // Сохраняем состояние текущего персонажа
-  saveStateForChar(currentChar);
-  currentChar = n;
-  localStorage.setItem('active_char', n);
-  updateCharUI();
-  loadState();
-}
-
-function updateCharUI() {
-  document.getElementById('charBtn1').classList.toggle('active', currentChar === 1);
-  document.getElementById('charBtn2').classList.toggle('active', currentChar === 2);
-  const icons = ['⚔️', '🛡️'];
-  const names = ['Персонаж 1', 'Персонаж 2'];
-  const idx = currentChar - 1;
-  document.getElementById('charIndicator').innerHTML = icons[idx] + ' &nbsp;' + names[idx];
-  // Цветовой акцент для персонажа 2
-  document.body.classList.toggle('char2-active', currentChar === 2);
-}
-
-function saveStateForChar(charNum) {
-  const suffix = charSuffix(charNum);
-  const arr = qa('.tasks-column input[type="checkbox"]').map(cb => !!cb.checked);
-  localStorage.setItem(storageKey + suffix, JSON.stringify(arr));
-  localStorage.setItem(vipStorageKey + suffix, JSON.stringify(!!vipCheckbox.checked));
-  localStorage.setItem(x2StorageKey + suffix, JSON.stringify(!!x2Checkbox.checked));
-  const cbOnlineEl = document.getElementById('cbOnline');
-  if (cbOnlineEl) localStorage.setItem(storageKey + suffix + '_online', cbOnlineEl.checked ? 'true' : 'false');
-}
-
 function q(sel){return document.querySelector(sel);} 
 function qa(sel){return Array.from(document.querySelectorAll(sel));}
 
@@ -1224,8 +1086,8 @@ function computeTotals(showVip, x2) {
 function refreshAll() {
   checkboxes = qa('.tasks-column input[type="checkbox"]');
   N = checkboxes.length;
-  const vipMode = !!JSON.parse(localStorage.getItem(getVipStorageKey()) || 'false');
-  const x2Mode = !!JSON.parse(localStorage.getItem(getX2StorageKey()) || 'false');
+  const vipMode = !!JSON.parse(localStorage.getItem(vipStorageKey) || 'false');
+  const x2Mode = !!JSON.parse(localStorage.getItem(x2StorageKey) || 'false');
   vipCheckbox.checked = vipMode; x2Checkbox.checked = x2Mode;
   updateRewardCellsDisplay(vipMode, x2Mode);
   const {totalDisplayVal, remaining} = computeTotals(vipMode, x2Mode);
@@ -1239,32 +1101,21 @@ function refreshAll() {
   if (typeof checkColumnCompletion === 'function') checkColumnCompletion();
 }
 function loadState() {
-  const raw = localStorage.getItem(getStorageKey());
+  const raw = localStorage.getItem(storageKey);
   let arr = null;
   try { arr = JSON.parse(raw); } catch(e){ arr = null; }
   if(!Array.isArray(arr) || arr.length !== N) arr = new Array(N).fill(false);
   for(let i=0;i<N;i++){ const cb = checkboxes[i]; if (cb) cb.checked = !!arr[i]; }
-  const vipMode = !!JSON.parse(localStorage.getItem(getVipStorageKey()) || 'false');
-  const x2Mode = !!JSON.parse(localStorage.getItem(getX2StorageKey()) || 'false');
+  const vipMode = !!JSON.parse(localStorage.getItem(vipStorageKey) || 'false');
+  const x2Mode = !!JSON.parse(localStorage.getItem(x2StorageKey) || 'false');
   vipCheckbox.checked = vipMode; x2Checkbox.checked = x2Mode;
-  // Онлайн-пузырёк
-  const cbOnlineEl = document.getElementById('cbOnline');
-  if (cbOnlineEl) {
-    const onlineRaw = localStorage.getItem(getStorageKey() + '_online');
-    cbOnlineEl.checked = onlineRaw === 'true';
-    const bubble = document.getElementById('onlineBubble');
-    if (bubble) bubble.classList.toggle('done', cbOnlineEl.checked);
-  }
   refreshAll();
 }
 function saveState() {
   const arr = qa('.tasks-column input[type="checkbox"]').map(cb => !!cb.checked);
-  localStorage.setItem(getStorageKey(), JSON.stringify(arr));
-  localStorage.setItem(getVipStorageKey(), JSON.stringify(!!vipCheckbox.checked));
-  localStorage.setItem(getX2StorageKey(), JSON.stringify(!!x2Checkbox.checked));
-  // Онлайн-пузырёк
-  const cbOnlineEl = document.getElementById('cbOnline');
-  if (cbOnlineEl) localStorage.setItem(getStorageKey() + '_online', cbOnlineEl.checked ? 'true' : 'false');
+  localStorage.setItem(storageKey, JSON.stringify(arr));
+  localStorage.setItem(vipStorageKey, JSON.stringify(!!vipCheckbox.checked));
+  localStorage.setItem(x2StorageKey, JSON.stringify(!!x2Checkbox.checked));
   refreshAll();
 }
 function attachCheckboxListeners(){
@@ -1295,8 +1146,8 @@ function onRowClick(e){
 }
 attachCheckboxListeners();
 attachRowClickListeners();
-vipCheckbox.addEventListener('change', ()=>{ localStorage.setItem(getVipStorageKey(), JSON.stringify(!!vipCheckbox.checked)); refreshAll(); });
-x2Checkbox.addEventListener('change', ()=>{ localStorage.setItem(getX2StorageKey(), JSON.stringify(!!x2Checkbox.checked)); refreshAll(); });
+vipCheckbox.addEventListener('change', ()=>{ localStorage.setItem(vipStorageKey, JSON.stringify(!!vipCheckbox.checked)); refreshAll(); });
+x2Checkbox.addEventListener('change', ()=>{ localStorage.setItem(x2StorageKey, JSON.stringify(!!x2Checkbox.checked)); refreshAll(); });
 document.getElementById('resetBtn').addEventListener('click', ()=>{
   qa('.tasks-column input[type="checkbox"]').forEach(cb => cb.checked = false);
   const bubble = document.getElementById('onlineBubble');
@@ -1346,7 +1197,6 @@ function attachColumnCompletionListeners() {
 }
 attachColumnCompletionListeners();
 checkColumnCompletion();
-updateCharUI();
 
 // ── Сброс прогресса отдельного столбца ──
 document.querySelectorAll('.col-reset-btn').forEach(btn => {
