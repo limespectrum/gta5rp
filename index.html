@@ -1,388 +1,2540 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RAGE:MP — Онлайн серверов</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Inter:wght@400;600&display=swap');
+<meta charset="UTF-8">
+<meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ФАРМ BP</title>
+<link rel="icon" type="image/png" href="https://psv4.userapi.com/s/v1/d2/OS1XuRQbrcwb45XOpQZ3lzZEOnFKmLQhQ-QIga0mxOtLC5nKBS-kWnJ4x13j3wIbtya2vNiAuhxKZg_F5n4RcOzLh3SCJCCNgw4scYil3cy3L8SN2IfuZDqEepVggECnhAAh-t7wuWh8/LIME_COIN.png">
+<style>
+  :root{
+    --easy-bg: #e9f7ef;
+    --easy-border: #b7e0c9;
+    --medium-bg: #fff9e6;
+    --medium-border: #f1e0a8;
+    --joint-bg: #eef5ff;
+    --joint-border: #c6dbff;
+    --avoid-bg: #f5f5f5;
+    --avoid-border: #dddddd;
+    --fraction-bg: #f6f0ff;
+    --fraction-border: #e1d6ff;
+    --online-bg: #fff7e6;
+    --online-border: #f2d9a8;
+    --card-shadow: 0 6px 18px rgba(12,20,36,0.06);
+    --done-bg: rgba(76,175,80,0.12);
+    --done-border: rgba(76,175,80,0.18);
+  }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      min-height: 100vh;
-      background: #0a0c12;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+  body { font-family: system-ui, -apple-system, Roboto, Arial, sans-serif; padding: 18px 24px; color:#e5e7eb; background:#0b1220; margin:0; }
+  .layout{ max-width:1800px; margin:0 auto; }
+  h1 { display: none; }
+  .title-capsule {
+    text-align: center;
+    margin: 0 0 8px 0;
+  }
+  .title-capsule-inner {
+    display: inline-block;
+    position: relative;
+    padding: 18px 52px;
+    border-radius: 100px;
+    background: linear-gradient(135deg, rgba(0,20,50,0.92), rgba(10,5,30,0.95));
+    border: 1.5px solid transparent;
+    background-clip: padding-box;
+    box-shadow:
+      0 0 0 1.5px rgba(0,255,255,0.35),
+      0 0 30px rgba(0,255,255,0.12),
+      0 0 60px rgba(200,0,255,0.08),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  .title-capsule-inner::before {
+    content: '';
+    position: absolute;
+    inset: -1.5px;
+    border-radius: 100px;
+    background: linear-gradient(135deg, #0ff 0%, #f0f 50%, #ffcc00 100%);
+    z-index: -1;
+    opacity: 0.5;
+  }
+  .title-main {
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #00eeff, #cc44ff, #ffdd00);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: block;
+    line-height: 1.1;
+    filter: drop-shadow(0 0 8px rgba(0,220,255,0.5));
+    user-select: none;
+    cursor: default;
+  }
+  .title-sub {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: rgba(180,220,255,0.55);
+    display: block;
+    margin-top: 4px;
+    user-select: none;
+    cursor: default;
+  }
+  .controls { display:flex; gap:12px; align-items:center; flex-wrap:wrap; background: rgba(10,20,40,0.75); backdrop-filter: blur(12px); border: 1px solid rgba(0,255,255,0.4); border-radius: 60px; padding: 12px 24px; margin-bottom: 24px; box-shadow: 0 0 15px rgba(0,255,255,0.2); }
+  .controls button:not(.char-btn) { background: linear-gradient(135deg, #ff3366, #cc0044); border: none; color: white; padding: 10px 24px; border-radius: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 0 6px #ff3366; user-select: none; }
+  .controls button:not(.char-btn):hover { transform: scale(1.05); box-shadow: 0 0 18px #ff3366; background: linear-gradient(135deg, #ff5577, #ee2255); }
+  .center-actions {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+  }
+  .left-group {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .right-group {
+    flex-wrap: wrap;
+    justify-self: end;
+  }
+  @media (max-width: 1300px) {
+    .center-actions {
+      grid-template-columns: 1fr;
+    }
+    .left-group, .right-group, .date-display {
+      justify-self: center;
       justify-content: center;
-      font-family: 'Inter', sans-serif;
-      overflow: hidden;
     }
+  }
 
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,165,0,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,165,0,0.04) 1px, transparent 1px);
-      background-size: 60px 60px;
-      animation: gridMove 20s linear infinite;
-      pointer-events: none;
-    }
-    @keyframes gridMove {
-      0%   { transform: translateY(0); }
-      100% { transform: translateY(60px); }
-    }
+  /* === VIP & X2 TOGGLE BUTTONS === */
+  .toggle-switch { display: inline-flex; align-items: center; gap: 0; cursor: pointer; }
+  .toggle-switch input { display: none; }
+  .switch-slider { display: none; }
 
-    .orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      pointer-events: none;
-    }
-    .orb-1 { width:400px;height:400px;background:#ff6a00;top:-100px;left:-100px;opacity:.15;animation:pulse 6s ease-in-out infinite; }
-    .orb-2 { width:350px;height:350px;background:#7b2fff;bottom:-80px;right:-80px;opacity:.15;animation:pulse 8s ease-in-out infinite reverse; }
-    @keyframes pulse {
-      0%,100% { opacity:.12; transform:scale(1); }
-      50%      { opacity:.22; transform:scale(1.1); }
-    }
+  .toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: 40px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.22s ease;
+    border: 2px solid rgba(160,180,220,0.45);
+    background: rgba(40,55,85,0.85);
+    color: #c8d8f0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .toggle-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.22s ease;
+    border-radius: 38px;
+  }
+  .toggle-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.15);
+  }
+  .toggle-btn:active {
+    transform: scale(0.97);
+  }
 
-    .wrapper {
-      position: relative;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 40px;
-      padding: 40px 20px;
-    }
+  /* VIP Platinum — золотой */
+  .toggle-btn-vip {
+    border-color: rgba(180,140,40,0.35);
+  }
+  .toggle-btn-vip::before {
+    background: linear-gradient(135deg, rgba(255,215,0,0.18), rgba(255,160,30,0.10));
+  }
+  .toggle-btn-vip:hover::before { opacity: 1; }
 
-    .header { text-align: center; }
-    .logo {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 13px; font-weight: 700;
-      letter-spacing: 6px; color: #ff6a00;
-      text-transform: uppercase; margin-bottom: 8px; opacity: .9;
-    }
-    .title {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 36px; font-weight: 700;
-      color: #fff; letter-spacing: 2px; text-transform: uppercase;
-    }
-    .title span { color: #ff6a00; }
-    .subtitle {
-      font-size: 13px; color: rgba(255,255,255,.35);
-      margin-top: 6px; letter-spacing: 1px;
-    }
+  .toggle-switch:has(#vipCheckbox:checked) .toggle-btn-vip {
+    background: linear-gradient(135deg, rgba(255,200,30,0.18), rgba(200,130,10,0.22));
+    border-color: #d4a017;
+    color: #ffe566;
+    text-shadow: 0 0 6px rgba(255,215,0,0.7), 0 0 14px rgba(255,180,0,0.5);
+    box-shadow: 0 0 10px rgba(255,200,0,0.35), 0 0 22px rgba(255,160,0,0.22), inset 0 0 8px rgba(255,215,0,0.10);
+    animation: goldPulse 2s ease-in-out infinite alternate;
+  }
+  @keyframes goldPulse {
+    0%  { box-shadow: 0 0 8px rgba(255,200,0,0.3), 0 0 18px rgba(255,160,0,0.18); }
+    100%{ box-shadow: 0 0 16px rgba(255,215,0,0.55), 0 0 32px rgba(255,180,0,0.32); }
+  }
 
-    .cards { display:flex; gap:24px; flex-wrap:wrap; justify-content:center; }
+  .toggle-btn-x2 {
+    border-color: rgba(200,60,130,0.35);
+  }
+  .toggle-btn-x2::before {
+    background: linear-gradient(135deg, rgba(255,80,160,0.18), rgba(255,120,180,0.10));
+  }
+  .toggle-btn-x2:hover::before { opacity: 1; }
 
-    .card {
-      width: 300px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 20px;
-      padding: 32px 28px 28px;
-      position: relative;
-      overflow: hidden;
-      backdrop-filter: blur(12px);
-      transition: transform .3s ease, box-shadow .3s ease;
-    }
-    .card:hover { transform:translateY(-6px); box-shadow:0 20px 60px rgba(0,0,0,.5); }
-    .card::before {
-      content:''; position:absolute; top:0;left:0;right:0;
-      height:2px; background:var(--accent);
-    }
-    .card::after {
-      content:''; position:absolute; top:-60px;left:50%;
-      transform:translateX(-50%); width:200px;height:200px;
-      background:var(--accent); border-radius:50%;
-      filter:blur(60px); opacity:.08; pointer-events:none;
-    }
-    .card.delperro { --accent: #ff6a00; }
-    .card.lapuerta { --accent: #7b2fff; }
+  .toggle-switch:has(#x2Checkbox:checked) .toggle-btn-x2 {
+    background: linear-gradient(135deg, rgba(255,80,160,0.20), rgba(255,140,190,0.14));
+    border-color: #ff50a0;
+    color: #ffaacc;
+    text-shadow: 0 0 6px rgba(255,80,160,0.9), 0 0 18px rgba(255,80,160,0.6);
+    box-shadow: 0 0 10px rgba(255,80,160,0.45), 0 0 24px rgba(255,80,160,0.25), inset 0 0 8px rgba(255,80,160,0.12);
+    animation: pinkPulse 1.8s ease-in-out infinite alternate;
+  }
+  @keyframes pinkPulse {
+    0%  { box-shadow: 0 0 8px rgba(255,80,160,0.4), 0 0 18px rgba(255,80,160,0.2); }
+    100%{ box-shadow: 0 0 18px rgba(255,80,160,0.65), 0 0 36px rgba(255,80,160,0.35); }
+  }
 
-    .server-badge {
-      display:inline-flex; align-items:center; gap:6px;
-      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
-      border-radius:8px; padding:5px 10px;
-      font-size:11px; font-weight:600; letter-spacing:1.5px;
-      color:rgba(255,255,255,.5); text-transform:uppercase; margin-bottom:20px;
-    }
-    .badge-dot {
-      width:6px;height:6px;border-radius:50%;
-      background:var(--accent); box-shadow:0 0 6px var(--accent);
-      animation:blink 2s ease-in-out infinite;
-      flex-shrink:0;
-    }
-    .badge-dot.loading {
-      background:transparent;
-      border:2px solid var(--accent); border-top-color:transparent;
-      width:8px;height:8px;
-      animation:spin 1s linear infinite;
-    }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-    @keyframes spin  { to{transform:rotate(360deg)} }
+  .switch-label { display: none; }
+  .date-display {
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    user-select: none;
+    cursor: default;
+    white-space: nowrap;
+    padding: 4px 14px;
+    border-radius: 40px;
+    border: 1px solid transparent;
+    background: transparent;
+  }
+  .date-display .date-day {
+    font-family: monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: rgba(0, 220, 255, 0.45);
+  }
+  .date-display .date-main {
+    font-family: monospace;
+    font-size: 1.25rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #a8f0ff, #00d2ff, #7df0ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 8px rgba(0, 210, 255, 0.7));
+    line-height: 1.1;
+  }
+  .date-display .date-time {
+    font-family: monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: rgba(0, 220, 255, 0.38);
+    margin-top: 1px;
+  }
+  body.char2-active .date-display .date-day {
+    color: rgba(57, 255, 100, 0.45);
+  }
+  body.char2-active .date-display .date-main {
+    background: linear-gradient(135deg, #afffcc, #39ff6a, #00ffaa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: drop-shadow(0 0 8px rgba(57, 255, 100, 0.7));
+  }
+  body.char2-active .date-display .date-time {
+    color: rgba(57, 255, 100, 0.38);
+  }
+  .legend { margin:8px 0 14px 0; display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:center; background: rgba(10,20,40,0.75); backdrop-filter: blur(12px); border-radius: 60px; padding: 12px 24px; border: 1px solid rgba(0,255,255,0.4); box-shadow: 0 0 15px rgba(0,255,255,0.2); }
 
-    .server-name {
-      font-family:'Rajdhani',sans-serif;
-      font-size:28px;font-weight:700;color:#fff;
-      letter-spacing:1px;margin-bottom:6px;
-    }
-    .server-desc { font-size:12px;color:rgba(255,255,255,.3);margin-bottom:28px; }
+  .filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 18px;
+    border-radius: 30px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    user-select: none;
+    border: 1.5px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.04);
+    color: rgba(150,160,180,0.5);
+    transition: all 0.2s ease;
+    text-decoration: line-through;
+    text-decoration-color: rgba(150,160,180,0.3);
+  }
+  .filter-btn:hover {
+    transform: scale(1.05);
+    background: rgba(255,255,255,0.10);
+    border-color: rgba(255,255,255,0.35);
+    color: rgba(220,230,255,0.85);
+    box-shadow: 0 0 14px rgba(255,255,255,0.12);
+  }
+  .filter-btn.active[data-col="col-easy"]:hover    { box-shadow: 0 0 18px rgba(74,222,128,0.45); }
+  .filter-btn.active[data-col="col-medium"]:hover  { box-shadow: 0 0 18px rgba(251,191,36,0.45); }
+  .filter-btn.active[data-col="col-joint"]:hover   { box-shadow: 0 0 18px rgba(96,165,250,0.45); }
+  .filter-btn.active[data-col="col-avoid"]:hover   { box-shadow: 0 0 18px rgba(148,163,184,0.35); }
+  .filter-btn.active[data-col="col-fraction"]:hover{ box-shadow: 0 0 18px rgba(192,132,252,0.45); }
+  .filter-btn.active {
+    text-decoration: none;
+  }
+  .filter-btn.active[data-col="col-easy"]    { background: rgba(74,222,128,0.15); border-color: rgba(74,222,128,0.6); color: #4ade80; box-shadow: 0 0 10px rgba(74,222,128,0.2); }
+  .filter-btn.active[data-col="col-medium"]  { background: rgba(251,191,36,0.15); border-color: rgba(251,191,36,0.6); color: #fbbf24; box-shadow: 0 0 10px rgba(251,191,36,0.2); }
+  .filter-btn.active[data-col="col-joint"]   { background: rgba(96,165,250,0.15); border-color: rgba(96,165,250,0.6); color: #60a5fa; box-shadow: 0 0 10px rgba(96,165,250,0.2); }
+  .filter-btn.active[data-col="col-avoid"]   { background: rgba(148,163,184,0.15); border-color: rgba(148,163,184,0.5); color: #94a3b8; box-shadow: 0 0 10px rgba(148,163,184,0.15); }
+  .filter-btn.active[data-col="col-fraction"]{ background: rgba(192,132,252,0.15); border-color: rgba(192,132,252,0.6); color: #c084fc; box-shadow: 0 0 10px rgba(192,132,252,0.2); }
 
-    .counter-block { display:flex;align-items:flex-end;gap:10px;margin-bottom:20px; }
-    .count {
-      font-family:'Rajdhani',sans-serif;
-      font-size:72px;font-weight:700;line-height:1;
-      color:var(--accent);text-shadow:0 0 30px var(--accent);
-      letter-spacing:-2px;
-      transition:opacity .25s;
-    }
-    .count.fade { opacity:.3; }
-    .count-label {
-      font-size:12px;color:rgba(255,255,255,.35);font-weight:600;
-      letter-spacing:1px;text-transform:uppercase;padding-bottom:12px;
-    }
+  /* === CHARACTER SWITCHER === */
+  .char-switcher {
+    display: inline-flex;
+    gap: 10px;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    border: none;
+  }
+  .char-btn-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    min-width: 120px;
+  }
+  .char-progress-bar {
+    height: 4px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.08);
+    overflow: hidden;
+    position: relative;
+  }
+  .char-progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 4px;
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+    background: linear-gradient(90deg, rgba(0,220,255,0.9), rgba(0,180,255,0.7));
+    box-shadow: 0 0 6px rgba(0,220,255,0.7);
+  }
+  /* char2 прогресс — зелёный */
+  body.char2-active #charFill1 {
+    background: linear-gradient(90deg, rgba(0,220,255,0.9), rgba(0,180,255,0.7));
+    box-shadow: 0 0 6px rgba(0,220,255,0.7);
+  }
+  #charFill2 {
+    background: linear-gradient(90deg, rgba(57,255,100,0.9), rgba(0,200,80,0.7));
+    box-shadow: 0 0 6px rgba(57,255,100,0.7);
+  }
+  .char-progress-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: rgba(150,180,220,0.5);
+    text-align: center;
+    font-family: monospace;
+    user-select: none;
+    line-height: 1;
+  }
+  #charBtn1.active ~ .char-progress-bar .char-progress-fill,
+  #charBtn2.active ~ .char-progress-bar .char-progress-fill {
+    box-shadow: 0 0 10px currentColor;
+  }
+  .char-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 22px;
+    border-radius: 40px;
+    border: 2px solid rgba(120,130,160,0.3);
+    background: rgba(40,55,85,0.5);
+    color: rgba(120,130,160,0.55);
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    font-weight: 700;
+    font-size: 0.88rem;
+    letter-spacing: 0.5px;
+    transition: all 0.22s ease;
+  }
+  .char-btn .char-icon { display: none; user-select: none; -webkit-user-select: none; }
+  .char-btn .char-label { font-size: 0.88rem; user-select: none; -webkit-user-select: none; pointer-events: none; }
+  .char-btn:hover {
+    transform: scale(1.05);
+    border-color: rgba(160,180,220,0.5);
+    color: rgba(200,210,240,0.8);
+  }
+  .char-btn.active {
+    background: linear-gradient(135deg, rgba(0,200,255,0.18), rgba(80,0,255,0.14));
+    border-color: rgba(0,220,255,0.7);
+    color: #7df0ff;
+    box-shadow: 0 0 12px rgba(0,220,255,0.45), 0 0 24px rgba(0,200,255,0.2), inset 0 0 8px rgba(0,200,255,0.08);
+    animation: charPulse 2.2s ease-in-out infinite alternate;
+  }
+  @keyframes charPulse {
+    0%  { box-shadow: 0 0 10px rgba(0,220,255,0.35), 0 0 20px rgba(0,200,255,0.18), inset 0 0 6px rgba(0,200,255,0.06); }
+    100%{ box-shadow: 0 0 22px rgba(0,220,255,0.65), 0 0 40px rgba(0,200,255,0.3), inset 0 0 12px rgba(0,200,255,0.12); }
+  }
+  /* Полоска активного персонажа под шапкой */
+  .char-indicator {
+    text-align: center;
+    margin: -14px 0 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #7df0ff;
+    text-shadow: 0 0 10px rgba(0,220,255,0.6);
+    opacity: 0.85;
+    transition: all 0.3s;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: default;
+  }
 
-    .bar-wrap { background:rgba(255,255,255,.06);border-radius:6px;height:6px;overflow:hidden;margin-bottom:16px; }
-    .bar-fill {
-      height:100%;border-radius:6px;
-      background:var(--accent);box-shadow:0 0 8px var(--accent);
-      transition:width .8s cubic-bezier(.4,0,.2,1);
-    }
+  /* Персонаж 2 — зелёная токсичная подсветка */
+  body.char2-active .char-btn#charBtn2.active {
+    background: linear-gradient(135deg, rgba(57,255,100,0.18), rgba(0,200,60,0.14));
+    border-color: rgba(57,255,100,0.75);
+    color: #39ff6a;
+    box-shadow: 0 0 12px rgba(57,255,100,0.55), 0 0 24px rgba(0,255,80,0.28), inset 0 0 8px rgba(57,255,100,0.12);
+    animation: greenCharPulse 2.2s ease-in-out infinite alternate;
+  }
+  @keyframes greenCharPulse {
+    0%  { box-shadow: 0 0 10px rgba(57,255,100,0.4), 0 0 20px rgba(0,255,80,0.2), inset 0 0 6px rgba(57,255,100,0.08); }
+    100%{ box-shadow: 0 0 22px rgba(57,255,100,0.72), 0 0 40px rgba(0,255,80,0.38), inset 0 0 12px rgba(57,255,100,0.16); }
+  }
+  body.char2-active .char-indicator {
+    color: #39ff6a;
+    text-shadow: 0 0 10px rgba(57,255,100,0.8), 0 0 22px rgba(0,255,80,0.5);
+  }
+  body.char2-active .controls {
+    border-color: rgba(57,255,100,0.45);
+    box-shadow: 0 0 18px rgba(57,255,100,0.2), 0 0 40px rgba(0,255,80,0.08);
+  }
+  body.char2-active .legend {
+    border-color: rgba(57,255,100,0.4);
+    box-shadow: 0 0 14px rgba(57,255,100,0.15);
+  }
+  /* Зелёная токсичная шапка для персонажа 2 */
+  body.char2-active .title-capsule-inner {
+    box-shadow:
+      0 0 0 1.5px rgba(57,255,100,0.5),
+      0 0 30px rgba(57,255,100,0.2),
+      0 0 60px rgba(0,255,80,0.12),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  body.char2-active .title-capsule-inner::before {
+    background: linear-gradient(135deg, #39ff6a 0%, #00ff55 40%, #aaff00 80%, #ccff00 100%);
+    opacity: 0.55;
+  }
+  body.char2-active .title-main {
+    background: linear-gradient(135deg, #39ff6a, #00ff99, #aaff00, #ccff44);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 10px rgba(57,255,100,0.7)) drop-shadow(0 0 20px rgba(0,255,80,0.4));
+  }
+  body.char2-active .title-sub {
+    color: rgba(100,255,160,0.6);
+  }
+  @keyframes greenToxicPulse {
+    0%   { box-shadow: 0 0 0 1.5px rgba(57,255,100,0.35), 0 0 25px rgba(57,255,100,0.18), 0 0 50px rgba(0,255,80,0.08), inset 0 1px 0 rgba(255,255,255,0.06); }
+    100% { box-shadow: 0 0 0 1.5px rgba(57,255,100,0.65), 0 0 50px rgba(57,255,100,0.35), 0 0 90px rgba(0,255,80,0.18), inset 0 1px 0 rgba(255,255,255,0.08); }
+  }
+  body.char2-active .title-capsule-inner {
+    animation: greenToxicPulse 3s ease-in-out infinite alternate;
+  }
 
-    .card-footer {
-      display:flex;justify-content:space-between;align-items:center;
-      font-size:11px;color:rgba(255,255,255,.25);
-    }
-    .lang-tag {
-      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
-      border-radius:6px;padding:3px 8px;
-      font-size:11px;font-weight:600;color:rgba(255,255,255,.4);letter-spacing:.5px;
-    }
+  .column.hidden {
+    display: none;
+  }
+  .column {
+    transition: opacity 0.3s ease;
+  }
 
-    /* Bottom bar */
-    .bottom-bar {
-      display:flex;flex-direction:column;align-items:center;gap:6px;
-    }
-    .refresh-status {
-      display:flex;align-items:center;gap:8px;
-      font-size:11px;color:rgba(255,255,255,.2);letter-spacing:.5px;
-    }
-    .refresh-ring { position:relative;width:16px;height:16px; }
-    .refresh-ring svg { transform:rotate(-90deg); }
-    .refresh-ring circle { fill:none;stroke:rgba(255,165,0,.15);stroke-width:2; }
-    .refresh-ring .progress {
-      stroke:rgba(255,165,0,.5);
-      stroke-dasharray: 37.7;
-      stroke-dashoffset: 37.7;
-      transition:stroke-dashoffset 1s linear;
-    }
-    .page-footer { font-size:11px;color:rgba(255,255,255,.15);letter-spacing:1px; }
-    .page-footer span { color:rgba(255,165,0,.4); }
-    .error-hint { font-size:10px;color:rgba(255,100,100,.6);letter-spacing:.3px;text-align:center;max-width:380px;line-height:1.5; }
-  </style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(var(--visible-cols, 5), 1fr);
+    gap: 14px;
+    margin: 0 auto;
+    align-items: start;
+    transition: grid-template-columns 0.35s ease;
+  }
+  .column { border-radius:10px; padding:12px; overflow:hidden; align-self:start; display:flex; flex-direction:column; box-sizing:border-box; background: var(--card-surface); border:1px solid #263145; box-shadow: var(--card-shadow); user-select:none; -webkit-user-select:none; }
+  .column h2 {
+    margin: 0 0 12px 0;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 8px 16px;
+    border-radius: 30px;
+    border: 1px solid currentColor;
+    user-select: none;
+    cursor: default;
+  }
+  .easy-col h2 {
+    color: #4ade80;
+    background: rgba(74,222,128,0.1);
+    border-color: rgba(74,222,128,0.45);
+    box-shadow: 0 0 12px rgba(74,222,128,0.15), inset 0 0 8px rgba(74,222,128,0.07);
+    text-shadow: 0 0 8px rgba(74,222,128,0.7);
+  }
+  .medium-col h2 {
+    color: #fbbf24;
+    background: rgba(251,191,36,0.1);
+    border-color: rgba(251,191,36,0.45);
+    box-shadow: 0 0 12px rgba(251,191,36,0.15), inset 0 0 8px rgba(251,191,36,0.07);
+    text-shadow: 0 0 8px rgba(251,191,36,0.7);
+  }
+  .joint-col h2 {
+    color: #60a5fa;
+    background: rgba(96,165,250,0.1);
+    border-color: rgba(96,165,250,0.45);
+    box-shadow: 0 0 12px rgba(96,165,250,0.15), inset 0 0 8px rgba(96,165,250,0.07);
+    text-shadow: 0 0 8px rgba(96,165,250,0.7);
+  }
+  .avoid-col h2 {
+    color: #94a3b8;
+    background: rgba(148,163,184,0.1);
+    border-color: rgba(148,163,184,0.4);
+    box-shadow: 0 0 12px rgba(148,163,184,0.12), inset 0 0 8px rgba(148,163,184,0.06);
+    text-shadow: 0 0 8px rgba(148,163,184,0.6);
+  }
+  .column table { width:100%; border-collapse:collapse; }
+  .column td { padding:8px 10px; border-bottom:1px solid rgba(255,255,255,0.08); vertical-align:middle; color:#e5e7eb; user-select:none; -webkit-user-select:none; cursor:pointer; }
+  .column .reward { white-space:nowrap; font-weight:700; }
+
+  .easy-col { border-color: rgba(34,197,94,.75); background: linear-gradient(0deg, rgba(34,197,94,.20), transparent 45%), var(--card-surface); }
+  .medium-col { border-color: rgba(245,158,11,.78); background: linear-gradient(0deg, rgba(245,158,11,.22), transparent 45%), var(--card-surface); }
+  .joint-col { border-color: rgba(59,130,246,.80); background: linear-gradient(0deg, rgba(59,130,246,.24), transparent 45%), var(--card-surface); }
+  .avoid-col { border-color: rgba(148,163,184,.70); background: linear-gradient(0deg, rgba(148,163,184,.18), transparent 45%), var(--card-surface); }
+  .fraction-col { border-color: rgba(139,92,246,.70); background: linear-gradient(0deg, rgba(139,92,246,.22), transparent 45%), var(--card-surface); }
+  .fraction-col h2 {
+    color: #c084fc;
+    background: rgba(192,132,252,0.1);
+    border-color: rgba(192,132,252,0.45);
+    box-shadow: 0 0 12px rgba(192,132,252,0.15), inset 0 0 8px rgba(192,132,252,0.07);
+    text-shadow: 0 0 8px rgba(192,132,252,0.7);
+  }
+  .fraction-table { background: transparent; border: none; border-radius: 0; margin-top: 0; }
+
+  .toggle-switch input[type="checkbox"] { display: none !important; }
+  input[type="checkbox"]{
+    -webkit-appearance: none; appearance: none; width: 18px; height: 18px; margin:0; border-radius:4px; border:2px solid #475569; background:#0b1220; display:inline-grid; place-content:center; outline:none;
+  }
+  input[type="checkbox"]::after{ content:""; width:12px; height:12px; transform:scale(0); transition:transform .18s ease; clip-path: polygon(14% 44%, 0 56%, 41% 96%, 100% 22%, 86% 8%, 41% 66%); background:#e5e7eb; }
+  input[type="checkbox"]:checked::after{ transform:scale(1); }
+  button, #fractionToggle{ padding:10px 14px; font-size:0.95rem; cursor:pointer; background:#111827; border:1px solid #334155; color:#e5e7eb; border-radius:10px; }
+  .online-bubble { display:inline-flex; align-items:center; gap:10px; padding:10px 14px; border-radius:999px; border:1px solid #f2d9a8; background: rgba(15,23,42,.72); margin-top:10px; font-weight:700; cursor:pointer; user-select:none; }
+  .online-bubble .bp { white-space:nowrap; padding:4px 8px; border-radius:8px; background:rgba(0,0,0,0.3); }
+
+
+  .total {
+    display: flex;
+    gap: 14px;
+    margin: 12px 0 14px 0;
+    position: relative;
+  }
+  .total-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 18px 24px;
+    border-radius: 20px;
+    backdrop-filter: blur(12px);
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: default;
+  }
+  .total-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    opacity: 0.07;
+  }
+  /* Итого — голубой циан */
+  .total-card.card-done {
+    background: rgba(5, 25, 40, 0.85);
+    border: 1px solid rgba(0, 210, 255, 0.45);
+    box-shadow: 0 0 20px rgba(0, 210, 255, 0.1), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .total-card.card-done::before {
+    background: radial-gradient(ellipse at top, #00d2ff, transparent 70%);
+    opacity: 0.12;
+  }
+  .total-card.card-done .card-icon { color: #00d2ff; }
+  .total-card.card-done .card-label { color: rgba(100, 220, 255, 0.7); }
+  .total-card.card-done .card-value {
+    background: linear-gradient(135deg, #a8f0ff, #00d2ff, #0099cc);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 8px rgba(0,210,255,0.6));
+  }
+  /* Осталось — розово-малиновый */
+  .total-card.card-left {
+    background: rgba(30, 5, 20, 0.85);
+    border: 1px solid rgba(255, 80, 160, 0.45);
+    box-shadow: 0 0 20px rgba(255, 80, 160, 0.1), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .total-card.card-left::before {
+    background: radial-gradient(ellipse at top, #ff50a0, transparent 70%);
+    opacity: 0.12;
+  }
+  .total-card.card-left .card-icon { color: #ff50a0; }
+  .total-card.card-left .card-label { color: rgba(255, 150, 200, 0.7); }
+  .total-card.card-left .card-value {
+    background: linear-gradient(135deg, #ffb3d9, #ff50a0, #cc2266);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 8px rgba(255,80,160,0.6));
+  }
+
+  .card-icon { display: none; }
+  .card-label {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    user-select: none;
+    cursor: default;
+  }
+  .card-value {
+    font-size: 2.2rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    line-height: 1;
+    user-select: none;
+    cursor: default;
+  }
+  .card-unit {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    opacity: 0.5;
+    margin-top: 2px;
+    user-select: none;
+    cursor: default;
+  }
+  @keyframes neonPulse { 0% { filter: drop-shadow(0 0 4px currentColor); } 100% { filter: drop-shadow(0 0 12px currentColor); } }
+  @media (max-width:700px){ .total{ flex-direction:column; } }
+
+  /* Персонаж 2 — Выполнено: зелёный */
+  body.char2-active .total-card.card-done {
+    background: rgba(5, 30, 15, 0.85);
+    border: 1px solid rgba(57, 255, 100, 0.45);
+    box-shadow: 0 0 20px rgba(57, 255, 100, 0.12), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  body.char2-active .total-card.card-done::before {
+    background: radial-gradient(ellipse at top, #39ff64, transparent 70%);
+    opacity: 0.12;
+  }
+  body.char2-active .total-card.card-done .card-label { color: rgba(100, 255, 150, 0.7); }
+  body.char2-active .total-card.card-done .card-value {
+    background: linear-gradient(135deg, #b8ffd0, #39ff64, #00cc44);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 8px rgba(57,255,100,0.7));
+  }
+
+  /* Персонаж 2 — Осталось: красный */
+  body.char2-active .total-card.card-left {
+    background: rgba(35, 5, 5, 0.85);
+    border: 1px solid rgba(255, 50, 50, 0.50);
+    box-shadow: 0 0 20px rgba(255, 50, 50, 0.12), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  body.char2-active .total-card.card-left::before {
+    background: radial-gradient(ellipse at top, #ff3232, transparent 70%);
+    opacity: 0.12;
+  }
+  body.char2-active .total-card.card-left .card-label { color: rgba(255, 140, 140, 0.7); }
+  body.char2-active .total-card.card-left .card-value {
+    background: linear-gradient(135deg, #ffaaaa, #ff3232, #cc0000);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 8px rgba(255,50,50,0.7));
+  }
+
+  .tasks-column tr{ transition: background .2s ease; cursor:pointer; user-select: none; }
+  .tasks-column td{ cursor: pointer; user-select: none; }
+  .tasks-column tr:hover td{ background: rgba(148,163,184,.10); }
+  .tasks-column tr.done td{ background: rgba(34,197,94,.22); border-bottom-color: rgba(34,197,94,.50); }
+  .tasks-column tr.done td:first-child{ color:#b8f3d6; text-decoration: line-through; text-decoration-color:#34d399; text-decoration-thickness:2px; }
+  .reward { font-weight:bold; background:rgba(2,6,23,.35); border-radius:4px; box-shadow:inset 0 0 0 1px rgba(148,163,184,.16); margin-left:10px; white-space:nowrap; text-align:center; min-width:45px; padding:2px 6px; transition: color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease; }
+
+  /* VIP активен — золотой текст BP */
+  body.vip-mode .reward {
+    color: #ffd700;
+    text-shadow: 0 0 6px rgba(255,210,0,0.7), 0 0 12px rgba(255,180,0,0.4);
+  }
+
+  /* x2 активен — только розовая обводка потолще */
+  body.x2-mode .reward {
+    background: rgba(2,6,23,.35);
+    box-shadow: inset 0 0 0 2px rgba(255,80,160,0.7), 0 0 6px rgba(255,80,160,0.2);
+  }
+
+  /* Оба активны — розовая обводка + золотой текст */
+  body.vip-mode.x2-mode .reward {
+    color: #ffd700;
+    text-shadow: 0 0 6px rgba(255,210,0,0.7), 0 0 12px rgba(255,180,0,0.4);
+    background: rgba(2,6,23,.35);
+    box-shadow: inset 0 0 0 2px rgba(255,80,160,0.7), 0 0 6px rgba(255,80,160,0.2);
+  }
+
+  @media (max-width:1600px){ .grid{ grid-template-columns: repeat(min(var(--visible-cols, 5), 3), 1fr); } }
+  @media (max-width:1100px){ .grid{ grid-template-columns: repeat(min(var(--visible-cols, 5), 2), 1fr); } }
+  @media (max-width:700px){ body{ padding:14px; } .grid{ grid-template-columns: 1fr; } .controls{ flex-direction:column; align-items:stretch; } .center-actions{ flex-wrap:wrap; justify-content:center; } }
+/* VIP режим — золотой текст для "3 часа в онлайне" */
+body.vip-mode .online-bubble {
+  color: #ffd700;
+  text-shadow: 0 0 6px rgba(255,210,0,0.7), 0 0 14px rgba(255,180,0,0.5);
+}
+body.vip-mode .online-bubble .bp {
+  color: #ffd700;
+  text-shadow: 0 0 6px rgba(255,210,0,0.7), 0 0 12px rgba(255,180,0,0.4);
+}
+
+/* x2 режим — розовая обводка на BP-квадратике онлайн пузыря */
+body.x2-mode .online-bubble .online-cb {
+  box-shadow: inset 0 0 0 2px rgba(255,80,160,0.85), 0 0 8px rgba(255,80,160,0.4);
+}
+
+/* x2 режим — розовая обводка на BP-квадратике онлайн пузыря */
+body.x2-mode .online-bubble .online-cb {
+  box-shadow: inset 0 0 0 2px rgba(255,80,160,0.85), 0 0 8px rgba(255,80,160,0.4);
+}
+
+/* Оба активны */
+body.vip-mode.x2-mode .online-bubble {
+  color: #ffd700;
+  text-shadow: 0 0 6px rgba(255,210,0,0.7), 0 0 14px rgba(255,180,0,0.5);
+}
+body.vip-mode.x2-mode .online-bubble .bp {
+  color: #ffd700;
+  text-shadow: 0 0 6px rgba(255,210,0,0.7), 0 0 12px rgba(255,180,0,0.4);
+}
+body.vip-mode.x2-mode .online-bubble .online-cb {
+  box-shadow: inset 0 0 0 2px rgba(255,80,160,0.85), 0 0 8px rgba(255,80,160,0.4);
+}
+
+/* Выполнено — зелёная подсветка онлайн-задания */
+.online-bubble.done {
+  background: rgba(34,197,94,0.18);
+  border-color: rgba(34,197,94,0.55);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.online-bubble.done .online-label {
+  color: #b8f3d6;
+  text-decoration: line-through;
+  text-decoration-color: #34d399;
+  text-decoration-thickness: 2px;
+}
+
+
+#resetBtn {
+  background: rgba(30, 40, 60, 0.7);
+  border: 1px solid rgba(0, 255, 255, 0.4);
+  color: #ccf4ff;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 10px 24px;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 4px rgba(0, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+}
+#resetBtn:hover {
+  transform: scale(1.02);
+  background: rgba(0, 255, 255, 0.15);
+  border-color: #0ff;
+  box-shadow: 0 0 12px cyan;
+  color: #ffffff;
+}
+
+/* ── ЗАВЕРШЕНО оверлей столбца ── */
+.column {
+  position: relative;
+}
+.col-done-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  z-index: 10;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  /* тёмный матовый, близкий к фону сайта */
+  background: rgba(8, 16, 30, 0.82);
+  backdrop-filter: blur(8px) saturate(0.85);
+  -webkit-backdrop-filter: blur(8px) saturate(0.85);
+  border: 1.5px solid rgba(100, 120, 150, 0.25);
+  box-shadow: inset 0 0 40px rgba(15,25,45,0.5), 0 0 20px rgba(0,0,0,0.3);
+  animation: overlayIn 0.35s ease;
+}
+.col-done-overlay.visible {
+  display: flex;
+}
+@keyframes overlayIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.col-done-label {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: #8eaac8;
+  text-shadow: 0 0 12px rgba(100,150,200,0.4), 0 2px 6px rgba(0,0,0,0.5);
+  text-align: center;
+  line-height: 1.2;
+}
+.col-done-icon {
+  display: none;
+}
+.col-reset-btn {
+  margin-top: 4px;
+  padding: 9px 22px;
+  border-radius: 30px;
+  border: 1.5px solid rgba(200, 215, 230, 0.4);
+  background: rgba(15, 25, 40, 0.55);
+  color: #c8d8e8;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+}
+.col-reset-btn:hover {
+  background: rgba(200, 215, 230, 0.15);
+  border-color: rgba(220, 235, 250, 0.7);
+  color: #fff;
+  box-shadow: 0 0 16px rgba(180,200,220,0.3);
+  transform: scale(1.04);
+}
+
+/* ══════════════════════════════════════════
+   ПЕРСОНАЖ 2 — переопределение цветов столбцов
+   ══════════════════════════════════════════ */
+
+/* Лёгкие → бирюза (бывший цвет фракционных) */
+body.char2-active .easy-col {
+  border-color: rgba(0, 210, 200, 0.75);
+  background: linear-gradient(0deg, rgba(0,200,190,.24), transparent 45%), var(--card-surface);
+}
+body.char2-active .easy-col h2 {
+  color: #00d8c8;
+  background: rgba(0,210,200,0.12);
+  border-color: rgba(0,200,190,0.50);
+  box-shadow: 0 0 14px rgba(0,200,190,0.25), inset 0 0 8px rgba(0,200,190,0.10);
+  text-shadow: 0 0 10px rgba(0,210,200,0.9), 0 0 20px rgba(0,180,170,0.5);
+}
+body.char2-active .filter-btn.active[data-col="col-easy"] {
+  background: rgba(0,210,200,0.15);
+  border-color: rgba(0,200,190,0.60);
+  color: #00d8c8;
+  box-shadow: 0 0 10px rgba(0,200,190,0.22);
+}
+body.char2-active .filter-btn.active[data-col="col-easy"]:hover {
+  box-shadow: 0 0 18px rgba(0,200,190,0.45);
+}
+
+/* Средние → жёлтый (бывший цвет лёгких) */
+body.char2-active .medium-col {
+  border-color: rgba(255, 230, 0, 0.80);
+  background: linear-gradient(0deg, rgba(255,220,0,.28), transparent 45%), var(--card-surface);
+}
+body.char2-active .medium-col h2 {
+  color: #ffe500;
+  background: rgba(255,230,0,0.12);
+  border-color: rgba(255,220,0,0.55);
+  box-shadow: 0 0 14px rgba(255,220,0,0.25), inset 0 0 8px rgba(255,220,0,0.10);
+  text-shadow: 0 0 10px rgba(255,220,0,0.9), 0 0 20px rgba(255,200,0,0.5);
+}
+body.char2-active .filter-btn.active[data-col="col-medium"] {
+  background: rgba(255,230,0,0.15);
+  border-color: rgba(255,220,0,0.65);
+  color: #ffe500;
+  box-shadow: 0 0 10px rgba(255,220,0,0.25);
+}
+body.char2-active .filter-btn.active[data-col="col-medium"]:hover {
+  box-shadow: 0 0 18px rgba(255,220,0,0.5);
+}
+body.char2-active .online-bubble {
+  border-color: rgba(255, 220, 0, 0.7);
+}
+body.char2-active .online-bubble.done {
+  background: rgba(255, 220, 0, 0.13);
+  border-color: rgba(255, 220, 0, 0.55);
+}
+body.char2-active .online-bubble.done .online-label {
+  color: #ffe97a;
+  text-decoration-color: #ffd700;
+}
+
+/* Совместные → без изменений (розово-малиновый) */
+body.char2-active .joint-col {
+  border-color: rgba(255, 50, 130, 0.80);
+  background: linear-gradient(0deg, rgba(255,40,120,.28), transparent 45%), var(--card-surface);
+}
+body.char2-active .joint-col h2 {
+  color: #ff3380;
+  background: rgba(255,50,130,0.12);
+  border-color: rgba(255,40,120,0.55);
+  box-shadow: 0 0 14px rgba(255,40,120,0.28), inset 0 0 8px rgba(255,40,120,0.12);
+  text-shadow: 0 0 10px rgba(255,40,120,0.9), 0 0 20px rgba(255,0,100,0.5);
+}
+body.char2-active .filter-btn.active[data-col="col-joint"] {
+  background: rgba(255,50,130,0.15);
+  border-color: rgba(255,40,120,0.65);
+  color: #ff3380;
+  box-shadow: 0 0 10px rgba(255,40,120,0.25);
+}
+body.char2-active .filter-btn.active[data-col="col-joint"]:hover {
+  box-shadow: 0 0 18px rgba(255,40,120,0.5);
+}
+
+/* Сложные → оранжевый (бывший цвет средних) */
+body.char2-active .avoid-col {
+  border-color: rgba(255, 100, 30, 0.80);
+  background: linear-gradient(0deg, rgba(255,90,20,.28), transparent 45%), var(--card-surface);
+}
+body.char2-active .avoid-col h2 {
+  color: #ff6420;
+  background: rgba(255,100,30,0.12);
+  border-color: rgba(255,90,20,0.55);
+  box-shadow: 0 0 14px rgba(255,90,20,0.28), inset 0 0 8px rgba(255,90,20,0.12);
+  text-shadow: 0 0 10px rgba(255,90,20,0.9), 0 0 20px rgba(255,60,0,0.5);
+}
+body.char2-active .filter-btn.active[data-col="col-avoid"] {
+  background: rgba(255,100,30,0.15);
+  border-color: rgba(255,90,20,0.65);
+  color: #ff6420;
+  box-shadow: 0 0 10px rgba(255,90,20,0.25);
+}
+body.char2-active .filter-btn.active[data-col="col-avoid"]:hover {
+  box-shadow: 0 0 18px rgba(255,90,20,0.5);
+}
+
+/* Фракционные → синий/бело-серый */
+body.char2-active .fraction-col {
+  border-color: rgba(100, 160, 255, 0.75);
+  background: linear-gradient(0deg, rgba(80,140,255,.20), transparent 45%), var(--card-surface);
+}
+body.char2-active .fraction-col h2 {
+  color: #a8c8ff;
+  background: rgba(100,160,255,0.10);
+  border-color: rgba(100,150,255,0.45);
+  box-shadow: 0 0 14px rgba(100,150,255,0.22), inset 0 0 8px rgba(100,150,255,0.08);
+  text-shadow: 0 0 10px rgba(120,170,255,0.8), 0 0 20px rgba(80,130,255,0.4);
+}
+body.char2-active .filter-btn.active[data-col="col-fraction"] {
+  background: rgba(100,160,255,0.13);
+  border-color: rgba(100,150,255,0.55);
+  color: #a8c8ff;
+  box-shadow: 0 0 10px rgba(100,150,255,0.2);
+}
+body.char2-active .filter-btn.active[data-col="col-fraction"]:hover {
+  box-shadow: 0 0 18px rgba(100,150,255,0.4);
+}
+
+
+  /* ── Прогресс заданий в карточке Выполнено ── */
+  .task-progress-wrap {
+    width: 100%;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+  .task-progress-bar {
+    width: 100%;
+    height: 5px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.07);
+    overflow: hidden;
+  }
+  .task-progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #00aaff, #00eeff);
+    box-shadow: 0 0 8px rgba(0,220,255,0.7);
+    transition: width 0.45s cubic-bezier(0.4,0,0.2,1);
+  }
+  body.char2-active .task-progress-fill {
+    background: linear-gradient(90deg, #00cc44, #39ff64);
+    box-shadow: 0 0 8px rgba(57,255,100,0.7);
+  }
+  .task-progress-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: rgba(100,220,255,0.55);
+    font-family: monospace;
+    user-select: none;
+    cursor: default;
+  }
+  body.char2-active .task-progress-label {
+    color: rgba(100,255,150,0.55);
+  }
+</style>
 </head>
 <body>
 
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
-
-<div class="wrapper">
-
-  <div class="header">
-    <div class="logo">RAGE Multiplayer</div>
-    <div class="title">Онлайн <span>серверов</span></div>
-    <div class="subtitle" id="lastUpdated">Загрузка данных...</div>
+<!-- ██ PIN LOCK SCREEN ██ -->
+<div id="pinOverlay" style="display:flex;">
+  <div class="pin-bg"></div>
+  <div class="pin-box" id="loadingBox">
+    <div class="pin-loader"></div>
+    <div class="pin-sub">ЗАГРУЗКА...</div>
   </div>
-
-  <div class="cards">
-
-    <div class="card delperro">
-      <div class="server-badge">
-        <div class="badge-dot loading" id="dot-delperro"></div>
-        RAGE:MP Server
-      </div>
-      <div class="server-name">Del Perro</div>
-      <div class="server-desc">Русский сервер · GTA V RP</div>
-      <div class="counter-block">
-        <div class="count fade" id="count-delperro">—</div>
-        <div class="count-label">игроков<br>онлайн</div>
-      </div>
-      <div class="bar-wrap"><div class="bar-fill" id="bar-delperro" style="width:0%"></div></div>
-      <div class="card-footer">
-        <span id="max-delperro">загрузка...</span>
-        <span class="lang-tag">Русский</span>
-      </div>
+  <div class="pin-box" id="loginBox" style="display:none;">
+    <div class="pin-title">⬡ ДОСТУП ЗАКРЫТ ⬡</div>
+    <div class="pin-sub">ВХОД В СИСТЕМУ</div>
+    <div class="auth-form">
+      <input type="text" id="authEmail" class="auth-input" placeholder="НИКНЕЙМ" autocomplete="username">
+      <input type="password" id="authPass" class="auth-input" placeholder="КОД ДОСТУПА" autocomplete="current-password">
     </div>
-
-    <div class="card lapuerta">
-      <div class="server-badge">
-        <div class="badge-dot loading" id="dot-lapuerta"></div>
-        RAGE:MP Server
-      </div>
-      <div class="server-name">La Puerta</div>
-      <div class="server-desc">Русский сервер · GTA V RP</div>
-      <div class="counter-block">
-        <div class="count fade" id="count-lapuerta">—</div>
-        <div class="count-label">игроков<br>онлайн</div>
-      </div>
-      <div class="bar-wrap"><div class="bar-fill" id="bar-lapuerta" style="width:0%"></div></div>
-      <div class="card-footer">
-        <span id="max-lapuerta">загрузка...</span>
-        <span class="lang-tag">Русский</span>
-      </div>
-    </div>
-
+    <div class="pin-error" id="pinError"></div>
+    <button class="pin-key auth-submit" id="authSubmit">ВОЙТИ</button>
   </div>
+</div>
 
-  <div class="bottom-bar">
-    <div class="refresh-status">
-      <div class="refresh-ring">
-        <svg width="16" height="16" viewBox="0 0 14 14">
-          <circle cx="7" cy="7" r="6"/>
-          <circle class="progress" id="refreshProgress" cx="7" cy="7" r="6"/>
+<style>
+#pinOverlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: #050d1a;
+  display: flex; align-items: center; justify-content: center;
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: all;
+}
+.pin-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 30%, rgba(0,255,255,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 80% 70%, rgba(180,0,255,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(255,200,0,0.04) 0%, transparent 70%);
+  animation: bgShift 6s ease-in-out infinite alternate;
+  pointer-events: all;
+}
+@keyframes bgShift {
+  0%   { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+.pin-box {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 18px;
+  padding: 48px 52px 44px;
+  border-radius: 24px;
+  background: rgba(5, 14, 30, 0.95);
+  border: 1.5px solid rgba(0,255,255,0.25);
+  box-shadow:
+    0 0 0 1px rgba(0,255,255,0.15),
+    0 0 40px rgba(0,255,255,0.18),
+    0 0 80px rgba(180,0,255,0.12),
+    0 0 120px rgba(255,200,0,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+  animation: boxPulse 3s ease-in-out infinite alternate;
+}
+@keyframes boxPulse {
+  0%   { box-shadow: 0 0 0 1px rgba(0,255,255,0.15), 0 0 40px rgba(0,255,255,0.18), 0 0 80px rgba(180,0,255,0.12), 0 0 120px rgba(255,200,0,0.06), inset 0 1px 0 rgba(255,255,255,0.06); }
+  100% { box-shadow: 0 0 0 1px rgba(0,255,255,0.35), 0 0 60px rgba(0,255,255,0.32), 0 0 110px rgba(180,0,255,0.22), 0 0 160px rgba(255,200,0,0.10), inset 0 1px 0 rgba(255,255,255,0.08); }
+}
+.pin-loader {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 3px solid rgba(0,255,255,0.18);
+  border-top-color: rgba(0,220,255,0.85);
+  animation: pinSpin 0.9s linear infinite;
+}
+@keyframes pinSpin {
+  to { transform: rotate(360deg); }
+}
+.pin-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #00eeff, #cc44ff, #ffdd00);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 10px rgba(0,220,255,0.6));
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+.pin-sub {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: rgba(150,210,255,0.45);
+  margin-top: -10px;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+.pin-error {
+  font-size: 0.82rem; font-weight: 700; letter-spacing: 2px;
+  color: #ff4444;
+  text-shadow: 0 0 8px rgba(255,60,60,0.7);
+  min-height: 20px;
+  text-transform: uppercase;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+  text-align: center;
+}
+.auth-form {
+  display: flex; flex-direction: column; gap: 14px;
+  width: 100%; margin: 8px 0 4px;
+}
+.auth-input {
+  width: 100%;
+  box-sizing: border-box;
+  height: 56px;
+  padding: 0 18px;
+  font-size: 1rem; font-weight: 700; font-family: monospace;
+  letter-spacing: 1px;
+  border-radius: 12px;
+  background: rgba(0,20,45,0.85);
+  border: 2px solid rgba(0,255,255,0.2);
+  color: #00eeff;
+  text-shadow: 0 0 8px rgba(0,220,255,0.5);
+  box-shadow: inset 0 0 12px rgba(0,255,255,0.06);
+  transition: all 0.15s ease;
+  outline: none;
+}
+.auth-input::placeholder {
+  color: rgba(150,210,255,0.35);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.auth-input:focus {
+  border-color: rgba(0,255,255,0.55);
+  color: #fff;
+  text-shadow: 0 0 14px rgba(0,220,255,0.9);
+  box-shadow: inset 0 0 16px rgba(0,255,255,0.12), 0 0 12px rgba(0,200,255,0.25);
+}
+.auth-input.error {
+  border-color: rgba(255,60,60,0.8) !important;
+  animation: shake 0.4s ease;
+}
+.auth-submit {
+  width: 100%;
+  height: 56px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(0,255,255,0.3);
+  background: linear-gradient(135deg, rgba(0,238,255,0.18), rgba(204,68,255,0.18));
+  color: #fff;
+  font-size: 1rem; font-weight: 900; font-family: monospace;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.auth-submit:hover {
+  background: linear-gradient(135deg, rgba(0,238,255,0.3), rgba(204,68,255,0.3));
+  border-color: rgba(0,255,255,0.6);
+  box-shadow: 0 0 14px rgba(0,255,255,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+  transform: translateY(-2px);
+}
+.auth-submit:active {
+  transform: scale(0.97);
+}
+.auth-submit:disabled {
+  opacity: 0.5;
+  cursor: default;
+  transform: none;
+}
+@keyframes shake {
+  0%,100%{ transform: translateX(0); }
+  20%    { transform: translateX(-8px); }
+  40%    { transform: translateX(8px); }
+  60%    { transform: translateX(-6px); }
+  80%    { transform: translateX(6px); }
+}
+</style>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getDatabase, ref, get, set as dbSet } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCMVd8slq6gc6lD1noTW0DDW8VkALJcZao",
+    authDomain: "bonuspoint-lime.firebaseapp.com",
+    databaseURL: "https://bonuspoint-lime-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "bonuspoint-lime",
+    storageBucket: "bonuspoint-lime.firebasestorage.app",
+    messagingSenderId: "647315774952",
+    appId: "1:647315774952:web:b8269372e8abf5d97f185d"
+  };
+
+  const authApp = initializeApp(firebaseConfig, "authApp");
+  const auth = getAuth(authApp);
+  const db = getDatabase(authApp);
+  setPersistence(auth, browserLocalPersistence);
+
+  // === Синхронизация прогресса между устройствами через Firebase ===
+  const SYNC_KEYS = [
+    'daily_tasks_done_v4_grid',
+    'daily_tasks_done_v4_grid_char2',
+    'daily_tasks_done_v4_grid_online',
+    'daily_tasks_done_v4_grid_char2_online',
+    'daily_tasks_vip_mode_v4',
+    'daily_tasks_vip_mode_v4_char2',
+    'daily_tasks_x2_mode_v4',
+    'daily_tasks_x2_mode_v4_char2',
+    'active_char'
+  ];
+  const SYNC_KEY_SET = new Set(SYNC_KEYS);
+  let currentUid = null;
+  let syncTimer = null;
+
+  const _origSetItem = localStorage.setItem.bind(localStorage);
+  localStorage.setItem = function(key, value) {
+    _origSetItem(key, value);
+    if (SYNC_KEY_SET.has(key) && currentUid) {
+      clearTimeout(syncTimer);
+      syncTimer = setTimeout(pushStateToCloud, 700);
+    }
+  };
+
+  function collectLocalState() {
+    const data = {};
+    SYNC_KEYS.forEach(k => {
+      const v = localStorage.getItem(k);
+      if (v !== null) data[k] = v;
+    });
+    return data;
+  }
+
+  async function pushStateToCloud() {
+    if (!currentUid) return;
+    try {
+      await dbSet(ref(db, 'users/' + currentUid + '/state'), collectLocalState());
+    } catch(e) {}
+  }
+
+  async function pullStateFromCloud(uid) {
+    try {
+      const snap = await get(ref(db, 'users/' + uid + '/state'));
+      if (snap.exists()) {
+        const data = snap.val();
+        SYNC_KEYS.forEach(k => {
+          if (data[k] !== undefined) _origSetItem(k, data[k]);
+          else localStorage.removeItem(k);
+        });
+        return true;
+      }
+    } catch(e) {}
+    return false;
+  }
+
+  const overlay = document.getElementById('pinOverlay');
+  const loadingBox = document.getElementById('loadingBox');
+  const loginBox = document.getElementById('loginBox');
+  const emailInput = document.getElementById('authEmail');
+  const passInput = document.getElementById('authPass');
+  const errEl = document.getElementById('pinError');
+  const submitBtn = document.getElementById('authSubmit');
+
+  document.body.style.overflow = 'hidden';
+
+  function getDisplayName(email) {
+    if (!email) return '';
+    const local = email.split('@')[0].toUpperCase();
+    return local;
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      overlay.style.animation = 'fadeOutOverlay 0.5s ease forwards';
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        document.body.style.overflow = '';
+      }, 500);
+      const nameEl = document.getElementById('userNameDisplay');
+      if (nameEl) nameEl.textContent = getDisplayName(user.email);
+
+      currentUid = user.uid;
+      const syncFlag = 'cloud_synced_' + user.uid;
+      if (sessionStorage.getItem(syncFlag) !== '1') {
+        const hadCloud = await pullStateFromCloud(user.uid);
+        sessionStorage.setItem(syncFlag, '1');
+        if (hadCloud) {
+          location.reload();
+          return;
+        } else {
+          pushStateToCloud();
+        }
+      }
+    } else {
+      loadingBox.style.display = 'none';
+      loginBox.style.display = 'flex';
+      overlay.style.animation = '';
+      overlay.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      const nameEl = document.getElementById('userNameDisplay');
+      if (nameEl) nameEl.textContent = '';
+      currentUid = null;
+    }
+  });
+
+  // Logout button
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      signOut(auth);
+    });
+  }
+
+  function clearError() {
+    errEl.textContent = '';
+    emailInput.classList.remove('error');
+    passInput.classList.remove('error');
+  }
+
+  function showError(msg) {
+    errEl.textContent = msg;
+    emailInput.classList.add('error');
+    passInput.classList.add('error');
+    setTimeout(() => {
+      emailInput.classList.remove('error');
+      passInput.classList.remove('error');
+    }, 400);
+  }
+
+  function tryLogin() {
+    let email = emailInput.value.trim();
+    const pass = passInput.value;
+    clearError();
+    if (!email || !pass) {
+      showError('✕ ЗАПОЛНИТЕ ВСЕ ПОЛЯ');
+      return;
+    }
+    if (!email.includes('@')) email = email + '@lime.ru';
+    submitBtn.disabled = true;
+    signInWithEmailAndPassword(auth, email, pass)
+      .catch(() => {
+        showError('✕ НЕВЕРНЫЙ ЛОГИН ИЛИ КОД ДОСТУПА');
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+      });
+  }
+
+  submitBtn.addEventListener('click', tryLogin);
+  [emailInput, passInput].forEach(el => {
+    el.addEventListener('input', clearError);
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') tryLogin();
+    });
+  });
+</script>
+<style>
+@keyframes fadeOutOverlay {
+  to { opacity: 0; transform: scale(1.04); }
+}
+</style>
+
+<div class="layout">
+<div class="title-capsule">
+  <div class="title-capsule-inner" id="titleCapsule" style="cursor:pointer;">
+    <span class="title-main">⚡ ФАРМ BONUS POINT ⚡</span>
+    <span class="title-sub">by LIME</span>
+  </div>
+</div>
+
+<style>
+.easter-name {
+  position: fixed;
+  font-family: monospace;
+  font-weight: 900;
+  font-size: 1.1rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 99999;
+  white-space: nowrap;
+  animation: easterFly 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes easterFly {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.4) skewX(20deg); filter: blur(4px) brightness(3); }
+  15%  { opacity: 1; transform: translate(var(--tx-mid), var(--ty-mid)) scale(1.15) skewX(-6deg); filter: blur(0px) brightness(2); }
+  60%  { opacity: 1; transform: translate(var(--tx), var(--ty)) scale(1) skewX(0deg); filter: blur(0) brightness(1.2); }
+  85%  { opacity: 0.7; transform: translate(var(--tx-end), var(--ty-end)) scale(0.85) skewX(4deg); filter: blur(1px); }
+  100% { opacity: 0; transform: translate(var(--tx-far), var(--ty-far)) scale(0.5); filter: blur(6px); }
+}
+.easter-glitch {
+  position: fixed;
+  pointer-events: none;
+  z-index: 99998;
+  font-family: monospace;
+  font-weight: 900;
+  font-size: 1.1rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: glitchShadow 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  mix-blend-mode: screen;
+}
+@keyframes glitchShadow {
+  0%   { opacity: 0; transform: translate(calc(var(--tx-mid) + 3px), calc(var(--ty-mid) - 2px)) scale(0.4); }
+  15%  { opacity: 0.6; transform: translate(calc(var(--tx-mid) + 5px), calc(var(--ty-mid) - 3px)) scale(1.15); }
+  60%  { opacity: 0.4; transform: translate(calc(var(--tx) + 4px), calc(var(--ty) - 2px)) scale(1); }
+  100% { opacity: 0; transform: translate(var(--tx-far), var(--ty-far)) scale(0.5); }
+}
+/* ── JEDI GAME BUTTON ── */
+.jedi-btn-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 10px 0;
+}
+.jedi-launch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 28px;
+  border-radius: 50px;
+  border: 1.5px solid rgba(0,255,255,0.35);
+  background: rgba(10,20,45,0.80);
+  backdrop-filter: blur(10px);
+  color: rgba(0,220,255,0.85);
+  font-family: monospace;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 12px rgba(0,200,255,0.12), 0 0 24px rgba(180,0,255,0.06);
+  position: relative;
+  overflow: hidden;
+}
+.jedi-launch-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50px;
+  background: linear-gradient(135deg, rgba(0,238,255,0.08), rgba(204,68,255,0.08));
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.jedi-launch-btn:hover { border-color: rgba(0,255,255,0.7); box-shadow: 0 0 22px rgba(0,200,255,0.35), 0 0 44px rgba(180,0,255,0.18); transform: translateY(-1px); }
+.jedi-launch-btn:hover::before { opacity: 1; }
+.jedi-launch-btn .jedi-pulse {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #00eeff;
+  box-shadow: 0 0 8px #00eeff, 0 0 16px rgba(0,220,255,0.6);
+  animation: jediDot 1.4s ease-in-out infinite alternate;
+  flex-shrink: 0;
+}
+@keyframes jediDot {
+  0% { box-shadow: 0 0 6px #00eeff, 0 0 12px rgba(0,220,255,0.5); opacity: 0.7; }
+  100% { box-shadow: 0 0 12px #cc44ff, 0 0 24px rgba(180,0,255,0.7); opacity: 1; background: #cc44ff; }
+}
+
+/* ── JEDI MODAL ── */
+.jedi-modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(4,10,24,0.72);
+  backdrop-filter: blur(10px);
+  align-items: center;
+  justify-content: center;
+}
+.jedi-modal-backdrop.open { display: flex; }
+.jedi-modal {
+  display: flex;
+  gap: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1.5px solid rgba(0,255,255,0.25);
+  box-shadow: 0 0 0 1px rgba(200,0,255,0.12), 0 0 60px rgba(0,200,255,0.18), 0 0 120px rgba(180,0,255,0.10);
+  background: rgba(8,16,34,0.97);
+  max-width: 95vw;
+  max-height: 90vh;
+  animation: jediModalIn 0.25s ease;
+}
+@keyframes jediModalIn {
+  from { opacity: 0; transform: scale(0.94) translateY(16px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+/* iframe side */
+.jedi-game-side {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.jedi-game-side iframe {
+  display: block;
+  border: none;
+  width: 760px;
+  height: 480px;
+}
+.jedi-close-btn {
+  position: absolute;
+  top: 10px; right: 12px;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(20,30,50,0.85);
+  color: rgba(200,220,255,0.6);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  z-index: 10;
+  user-select: none;
+}
+.jedi-close-btn:hover { background: rgba(255,50,80,0.25); color: #fff; border-color: rgba(255,50,80,0.5); }
+
+/* leaderboard side */
+.jedi-lb-side {
+  width: 220px;
+  flex-shrink: 0;
+  border-left: 1px solid rgba(0,255,255,0.12);
+  background: rgba(6,12,28,0.95);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 16px;
+  gap: 10px;
+  overflow-y: auto;
+}
+.jedi-lb-title {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: rgba(0,220,255,0.5);
+  text-align: center;
+  margin-bottom: 4px;
+  user-select: none;
+}
+.jedi-lb-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.05);
+  user-select: none;
+}
+.jedi-lb-rank { font-size: 0.7rem; font-weight: 900; font-family: monospace; width: 20px; text-align: center; color: rgba(150,170,200,0.4); }
+.jedi-lb-rank.gold { color: #ffdd00; text-shadow: 0 0 6px rgba(255,220,0,0.6); }
+.jedi-lb-rank.silver { color: #b0c0d8; }
+.jedi-lb-rank.bronze { color: #e0905a; }
+.jedi-lb-name { flex: 1; font-size: 0.75rem; font-weight: 700; font-family: monospace; color: rgba(200,220,255,0.8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.jedi-lb-score { font-size: 0.8rem; font-weight: 900; font-family: monospace; color: #cc44ff; text-shadow: 0 0 6px rgba(200,60,255,0.4); }
+.jedi-lb-empty { font-size: 0.72rem; color: rgba(150,160,180,0.35); text-align: center; font-family: monospace; padding: 16px 0; }
+
+</style>
+
+<script>
+(function(){
+  const names = ['РИО','КАДЖИ','КОРВАЛОЛ','ЭДВИН','ALICE','АЛИК','БЕКА','САНТИ','NEWWITE','ДИМА','ДАНЯ','ВАНЯ','МАКС','ЖЕНЯ','МАКАКОВКА','СОЛКА','ЭТО ЛАЙМ ЛАЙМ ЛАЙМ','LIME COIN CLUB','DEL PERRO','LA PUERTA','GTA 5 RP'];
+  const colors = [
+    'linear-gradient(135deg,#00eeff,#00aaff)',
+    'linear-gradient(135deg,#ff50a0,#ff00ff)',
+    'linear-gradient(135deg,#ffdd00,#ff9900)',
+    'linear-gradient(135deg,#39ff6a,#00ffaa)',
+    'linear-gradient(135deg,#c084fc,#7c3aed)',
+    'linear-gradient(135deg,#ff6464,#ff0044)',
+    'linear-gradient(135deg,#00ffee,#0088ff)',
+    'linear-gradient(135deg,#ffe566,#ffaa00)',
+    'linear-gradient(135deg,#ff80c0,#ff3388)',
+  ];
+  const glitchColors = ['#ff0044','#00ffee','#ffdd00','#ff00ff','#00ff88'];
+
+  document.getElementById('titleCapsule').addEventListener('click', function(e){
+    const rect = this.getBoundingClientRect();
+    const ox = rect.left + rect.width / 2;
+    const oy = rect.top + rect.height / 2;
+
+    // Pick 5–7 random names (no repeats)
+    const shuffled = [...names].sort(() => Math.random() - 0.5).slice(0, 6 + Math.floor(Math.random()*2));
+
+    shuffled.forEach((name, i) => {
+      const delay = i * 55;
+
+      // direction: spread left and right in a wave
+      const side = i % 2 === 0 ? 1 : -1;
+      const spread = 180 + Math.random() * 280;
+      const angle = (Math.random() * 40 - 20) * (Math.PI / 180);
+      const tx = side * (spread + i * 30) * Math.cos(angle);
+      const ty = (-60 - Math.random() * 120 + i * 15) * Math.abs(Math.sin(angle + 0.5));
+      const txMid = tx * 0.45;
+      const tyMid = ty * 0.4 - 20;
+      const txEnd = tx * 1.1;
+      const tyEnd = ty * 1.15;
+      const txFar = tx * 1.4;
+      const tyFar = ty * 1.5 + 30;
+
+      const color = colors[i % colors.length];
+
+      setTimeout(() => {
+        // Main name element
+        const el = document.createElement('span');
+        el.className = 'easter-name';
+        el.textContent = name;
+        el.style.cssText = `
+          left:${ox}px; top:${oy}px;
+          background: ${color};
+          -webkit-background-clip: text; background-clip: text; color: transparent;
+          filter: drop-shadow(0 0 8px rgba(0,220,255,0.8));
+          --tx-mid: ${txMid}px; --ty-mid: ${tyMid}px;
+          --tx: ${tx}px; --ty: ${ty}px;
+          --tx-end: ${txEnd}px; --ty-end: ${tyEnd}px;
+          --tx-far: ${txFar}px; --ty-far: ${tyFar}px;
+          text-shadow: none;
+          transform-origin: center;
+        `;
+        document.body.appendChild(el);
+
+        // Glitch shadow copy
+        const gc = glitchColors[Math.floor(Math.random() * glitchColors.length)];
+        const glitch = document.createElement('span');
+        glitch.className = 'easter-glitch';
+        glitch.textContent = name;
+        glitch.style.cssText = `
+          left:${ox}px; top:${oy}px;
+          color: ${gc};
+          opacity: 0.5;
+          --tx-mid: ${txMid}px; --ty-mid: ${tyMid}px;
+          --tx: ${tx}px; --ty: ${ty}px;
+          --tx-far: ${txFar}px; --ty-far: ${tyFar}px;
+        `;
+        document.body.appendChild(glitch);
+
+        setTimeout(() => { el.remove(); glitch.remove(); }, 1500);
+      }, delay);
+    });
+  });
+})();
+</script>
+
+<div class="controls" style="position:relative;">
+  <div class="center-actions">
+    <div class="left-group">
+    <button id="resetBtn">⟳ Сбросить задания</button>
+    <label class="toggle-switch">
+      <input id="vipCheckbox" type="checkbox">
+      <span class="switch-slider"></span>
+      <span class="toggle-btn toggle-btn-vip">💎 Platinum VIP</span>
+    </label>
+    <label class="toggle-switch">
+      <input id="x2Checkbox" type="checkbox">
+      <span class="switch-slider"></span>
+      <span class="toggle-btn toggle-btn-x2">✨ Акция x2</span>
+    </label>
+    </div>
+    <div class="date-display" id="currentDate">
+      <span class="date-day" id="dateDayName"></span>
+      <span class="date-main" id="dateMainText">—</span>
+      <span class="date-online"><span class="online-dot-mini"></span><span id="onlineCount">—</span> онлайн
+        <div class="online-tooltip" id="onlineTooltip">
+          <div class="online-tooltip-title">В сети сейчас</div>
+          <div class="online-tooltip-list" id="onlineNickList"><div class="online-tooltip-empty">...</div></div>
+        </div>
+      </span>
+    </div>
+    <div class="right-group" style="display:flex; align-items:center; gap: 14px;">
+      <div class="char-switcher">
+        <button class="char-btn active" id="charBtn1" onclick="switchChar(1)">
+          <span class="char-label">Персонаж 1</span>
+        </button>
+        <button class="char-btn" id="charBtn2" onclick="switchChar(2)">
+          <span class="char-label">Персонаж 2</span>
+        </button>
+      </div>
+      <span id="userNameDisplay" style="
+        font-family: monospace;
+        font-size: 1.15rem;
+        font-weight: 900;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        background: linear-gradient(135deg, #00eeff, #cc44ff, #ffdd00);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        filter: drop-shadow(0 0 10px rgba(0,220,255,0.6));
+        user-select: none;
+        cursor: default;
+        white-space: nowrap;
+      "></span>
+      <button id="logoutBtn" title="Выйти из аккаунта" style="
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: linear-gradient(135deg, rgba(255,50,50,0.12), rgba(180,0,0,0.10));
+        border: 1.5px solid rgba(255,80,80,0.4);
+        color: rgba(255,120,120,0.85);
+        padding: 7px 16px;
+        border-radius: 40px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        cursor: pointer;
+        user-select: none;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        box-shadow: 0 0 8px rgba(255,50,50,0.12);
+      " onmouseover="this.style.boxShadow='0 0 18px rgba(255,50,50,0.4)';this.style.borderColor='rgba(255,80,80,0.7)';this.style.color='#ff9999';" onmouseout="this.style.boxShadow='0 0 8px rgba(255,50,50,0.12)';this.style.borderColor='rgba(255,80,80,0.4)';this.style.color='rgba(255,120,120,0.85)';">
+        <svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.9;flex-shrink:0;">
+          <rect x="0" y="0.5" width="14" height="1.5" rx="0.75" fill="currentColor"/>
+          <rect x="0" y="5" width="14" height="1.5" rx="0.75" fill="currentColor"/>
+          <rect x="0" y="9.5" width="14" height="1.5" rx="0.75" fill="currentColor"/>
         </svg>
-      </div>
-      <span id="refreshCountdown">обновление через 5:00</span>
+        Выйти
+      </button>
     </div>
-    <div class="page-footer">Данные: <span>rage.mp/masterlist</span></div>
-    <div class="error-hint" id="errorHint"></div>
+  </div>
+</div>
+
+<div class="char-indicator" id="charIndicator">⚔️ &nbsp;Персонаж 1</div>
+
+
+<!-- ── JEDI GAME BUTTON ── -->
+<div class="jedi-btn-wrap">
+  <button class="jedi-launch-btn" onclick="openJediModal()">
+    <span class="jedi-pulse"></span>
+    ⚔️ JEDI RUNNER · СОРЕВНОВАНИЕ
+    <span class="jedi-pulse"></span>
+  </button>
+</div>
+
+<!-- ── JEDI MODAL ── -->
+<div class="jedi-modal-backdrop" id="jediModalBackdrop" onclick="closeJediModal(event)">
+  <div class="jedi-modal">
+    <div class="jedi-game-side">
+      <button class="jedi-close-btn" onclick="closeJediModalDirect()">✕</button>
+      <iframe id="jediFrame" src="" scrolling="no" allow="autoplay"></iframe>
+    </div>
+    <div class="jedi-lb-side">
+      <div class="jedi-lb-title">🏆 Лидерборд</div>
+      <div id="jediLbList"><div class="jedi-lb-empty">ЗАГРУЗКА...</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="legend">
+  <button class="filter-btn active" data-col="col-easy">ЛЁГКИЕ</button>
+  <button class="filter-btn active" data-col="col-medium">СРЕДНИЕ</button>
+  <button class="filter-btn active" data-col="col-joint">СОВМЕСТНЫЕ</button>
+  <button class="filter-btn active" data-col="col-avoid">СЛОЖНЫЕ</button>
+  <button class="filter-btn active" data-col="col-fraction">ФРАКЦИОННЫЕ</button>
+</div>
+
+<div class="total">
+  <div class="total-card card-done">
+    <div class="card-icon">✅</div>
+    <div class="card-label">Выполнено</div>
+    <div class="card-value" id="totalDisplay">0</div>
+    <div class="card-unit">BONUS POINTS</div>
+    <div class="task-progress-wrap">
+      <div class="task-progress-bar">
+        <div class="task-progress-fill" id="taskProgressFill"></div>
+      </div>
+      <div class="task-progress-label" id="taskProgressLabel">0 / 0 заданий</div>
+    </div>
+  </div>
+  <div class="total-card card-left">
+    <div class="card-icon">⏳</div>
+    <div class="card-label">Осталось</div>
+    <div class="card-value" id="remainingDisplay">324</div>
+    <div class="card-unit">BONUS POINTS</div>
+  </div>
+</div>
+
+<div class="grid" id="tasksGrid">
+  <!-- Легкие -->
+  <div class="column easy-col" id="col-easy">
+    <div class="col-done-overlay" id="overlay-col-easy">
+      <div class="col-done-icon">✅</div>
+      <div class="col-done-label">ЗАВЕРШЕНО</div>
+      <button class="col-reset-btn" data-target="col-easy">⟳ Сбросить прогресс</button>
+    </div>
+    <h2>Легкие</h2>
+    <table class="tasks-column"><tbody>
+      <tr><td>Купить лотерейный билет</td><td style="width:1px;"><input id="cb0" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Посетить любой сайт в браузере</td><td><input id="cb1" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Поставить лайк любой анкете в Match</td><td><input id="cb2" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Зайти в любой канал в Brawl</td><td><input id="cb3" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Добавить 5 видео в кинотеатре</td><td><input id="cb4" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Арендовать киностудию</td><td><input id="cb5" type="checkbox"></td><td class="reward" data-with="4" data-without="2">8 BP</td></tr>
+      <tr><td>Забить 2 гола в футболе</td><td><input id="cb6" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Починить деталь в автосервисе</td><td><input id="cb7" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Успешная тренировка в тире</td><td><input id="cb8" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Поиграть 1 минуту в настольный теннис</td><td><input id="cb9" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>10 действий на ферме</td><td><input id="cb10" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Нули в казино</td><td><input id="cb11" type="checkbox"></td><td class="reward" data-with="4" data-without="2">8 BP</td></tr>
+      <tr><td>Ставка межсерверное колесо</td><td><input id="cb12" type="checkbox"></td><td class="reward" data-with="6" data-without="3">12 BP</td></tr>
+      <tr><td>Забросить 2 мяча в баскетболе</td><td><input id="cb13" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Поиграть 1 минуту в большой теннис</td><td><input id="cb14" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Победить в дартс</td><td><input id="cb15" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Забить 10 голов в волейболе</td><td><input id="cb16" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Сделать платёж по лизингу</td><td><input id="cb41" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+    </tbody></table>
   </div>
 
+  <!-- Средние -->
+  <div class="column medium-col" id="col-medium">
+    <div class="col-done-overlay" id="overlay-col-medium">
+      <div class="col-done-icon">✅</div>
+      <div class="col-done-label">ЗАВЕРШЕНО</div>
+      <button class="col-reset-btn" data-target="col-medium">⟳ Сбросить прогресс</button>
+    </div>
+    <h2>Средние</h2>
+    <div style="margin-bottom:12px; display:flex; justify-content:center;"><div class="online-bubble" id="onlineBubble"><input class="tasks-column" id="cbOnline" type="checkbox" title="3 часа в онлайне"><div class="online-label">3 часа в онлайне</div><div class="bp online-cb" id="onlineBp">8 BP</div></div></div>
+    <table class="tasks-column"><tbody>
+      <tr><td>25 действий на стройке</td><td><input id="cb17" type="checkbox"></td><td class="reward" data-with="4" data-without="2">8 BP</td></tr>
+      <tr><td>25 действий в порту</td><td><input id="cb18" type="checkbox"></td><td class="reward" data-with="4" data-without="2">8 BP</td></tr>
+      <tr><td>25 действий в шахте</td><td><input id="cb19" type="checkbox"></td><td class="reward" data-with="4" data-without="2">8 BP</td></tr>
+      <tr><td>2 круга на любом маршруте автобусника</td><td><input id="cb21" type="checkbox"></td><td class="reward" data-with="4" data-without="2">8 BP</td></tr>
+      <tr><td>Выполнить 2 квеста любых клубов</td><td><input id="cb22" type="checkbox"></td><td class="reward" data-with="8" data-without="4">16 BP</td></tr>
+      <tr><td>Проехать 1 станцию на метро</td><td><input id="cb23" type="checkbox"></td><td class="reward" data-with="4" data-without="2">8 BP</td></tr>
+      <tr><td>Поймать 20 рыб</td><td><input id="cb24" type="checkbox"></td><td class="reward" data-with="8" data-without="4">16 BP</td></tr>
+      <tr><td>Кинуть мяч питомцу 15 раз</td><td><input id="cb25" type="checkbox"></td><td class="reward" data-with="4" data-without="2">8 BP</td></tr>
+      <tr><td>15 выполненных питомцем команд</td><td><input id="cb26" type="checkbox"></td><td class="reward" data-with="4" data-without="2">8 BP</td></tr>
+      <tr><td>20 подходов в тренажерном зале</td><td><input id="cb27" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Выкопать 1 сокровище</td><td><input id="cb30" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>5 раз снять 100% шкуру с животных</td><td><input id="cb34" type="checkbox"></td><td class="reward" data-with="4" data-without="2">8 BP</td></tr>
+      <tr><td>Выполнить 3 заказа дальнобойщиком</td><td><input id="cb35" type="checkbox"></td><td class="reward" data-with="4" data-without="2">8 BP</td></tr>
+    </tbody></table>
+  </div>
+
+  <!-- Совместные -->
+  <div class="column joint-col" id="col-joint">
+    <div class="col-done-overlay" id="overlay-col-joint">
+      <div class="col-done-icon">✅</div>
+      <div class="col-done-label">ЗАВЕРШЕНО</div>
+      <button class="col-reset-btn" data-target="col-joint">⟳ Сбросить прогресс</button>
+    </div>
+    <h2>Совместные</h2>
+    <table class="tasks-column"><tbody>
+      <tr><td>Сыграть в мафию в казино</td><td><input id="cb_mafia2" type="checkbox"></td><td class="reward" data-with="6" data-without="3">12 BP</td></tr>
+      <tr><td>Выиграть гонку в картинге</td><td><input id="cb29" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Проехать 1 уличную гонку (через тлф. ставка от 1000$)</td><td><input id="cb31" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Выиграть 5 игр в тренировочном комплексе со ставкой (от 100$)</td><td><input id="cb32" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Выиграть 3 любых игры на арене со ставкой (от 100$)</td><td><input id="cb33" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>3 победы в Дэнс Баттлах</td><td><input id="cb37" type="checkbox"></td><td class="reward" data-with="4" data-without="2">8 BP</td></tr>
+      <tr><td>Победить в армрестлинге</td><td><input id="cb20" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Починка авто другому игроку</td><td><input id="cb_repair_other" type="checkbox"></td><td class="reward" data-with="4" data-without="2">8 BP</td></tr>
+    </tbody></table>
+  </div>
+
+  <!-- Не хочется -->
+  <div class="column avoid-col" id="col-avoid">
+    <div class="col-done-overlay" id="overlay-col-avoid">
+      <div class="col-done-icon">✅</div>
+      <div class="col-done-label">ЗАВЕРШЕНО</div>
+      <button class="col-reset-btn" data-target="col-avoid">⟳ Сбросить прогресс</button>
+    </div>
+    <h2>Сложные</h2>
+    <table class="tasks-column"><tbody>
+      <tr><td>10 посылок на почте</td><td><input id="cb28" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Прокрутить за DP серебрянный или золотой кейс</td><td><input id="cb36" type="checkbox"></td><td class="reward" data-with="20" data-without="10">40 BP</td></tr>
+      <tr><td>Заказ материалов для бизнеса вручную (просто прожать вкл/выкл)</td><td><input id="cb38" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Потушить 25 "огоньков" пожарным</td><td><input id="cb39" type="checkbox"></td><td class="reward" data-with="2" data-without="1">4 BP</td></tr>
+      <tr><td>Два раза оплатить смену внешности у хирурга в EMS</td><td><input id="cb40" type="checkbox"></td><td class="reward" data-with="4" data-without="2">8 BP</td></tr>
+      <tr><td>Принять участие в двух аирдропах</td><td><input id="cb42" type="checkbox"></td><td class="reward" data-with="8" data-without="4">16 BP</td></tr>
+    </tbody></table>
+  </div>
+
+  <!-- Фракционные -->
+  <div class="column fraction-col" id="col-fraction">
+    <div class="col-done-overlay" id="overlay-col-fraction">
+      <div class="col-done-icon">✅</div>
+      <div class="col-done-label">ЗАВЕРШЕНО</div>
+      <button class="col-reset-btn" data-target="col-fraction">⟳ Сбросить прогресс</button>
+    </div>
+    <h2>Фракционные</h2>
+    <table class="fraction-table tasks-column" id="fractionTable"><tbody id="fractionTbody">
+      <tr class="fraction-row"><td>7 закрашенных граффити</td><td><input class="fraction-cb" data-with="1" data-without="1" type="checkbox"></td><td class="reward" data-with="1" data-without="1">4 BP</td></tr>
+      <tr class="fraction-row"><td>Сдать 5 контрабанды</td><td><input class="fraction-cb" data-with="2" data-without="2" type="checkbox"></td><td class="reward" data-with="2" data-without="2">8 BP</td></tr>
+      <tr class="fraction-row"><td>Участие в каптах/бизварах</td><td><input class="fraction-cb" data-with="1" data-without="1" type="checkbox"></td><td class="reward" data-with="1" data-without="1">4 BP</td></tr>
+      <tr class="fraction-row"><td>Сдать Хаммер с ВЗХ</td><td><input class="fraction-cb" data-with="3" data-without="3" type="checkbox"></td><td class="reward" data-with="3" data-without="3">12 BP</td></tr>
+      <tr class="fraction-row"><td>5 выданных медкарт в EMS</td><td><input class="fraction-cb" data-with="2" data-without="2" type="checkbox"></td><td class="reward" data-with="2" data-without="2">8 BP</td></tr>
+      <tr class="fraction-row"><td>Закрыть 15 вызовов в EMS</td><td><input class="fraction-cb" data-with="2" data-without="2" type="checkbox"></td><td class="reward" data-with="2" data-without="2">8 BP</td></tr>
+      <tr class="fraction-row"><td>Отредактировать 40 объявлений в WN</td><td><input class="fraction-cb" data-with="2" data-without="2" type="checkbox"></td><td class="reward" data-with="2" data-without="2">8 BP</td></tr>
+      <tr class="fraction-row"><td>Взломать 15 замков на ограбах домов или автоугонах</td><td><input class="fraction-cb" data-with="2" data-without="2" type="checkbox"></td><td class="reward" data-with="2" data-without="2">8 BP</td></tr>
+      <tr class="fraction-row"><td>Закрыть 5 кодов в силовых структурах</td><td><input class="fraction-cb" data-with="2" data-without="2" type="checkbox"></td><td class="reward" data-with="2" data-without="2">8 BP</td></tr>
+      <tr class="fraction-row"><td>Поставить на учет 2 автомобиля (для LSPD)</td><td><input class="fraction-cb" data-with="1" data-without="1" type="checkbox"></td><td class="reward" data-with="1" data-without="1">4 BP</td></tr>
+      <tr class="fraction-row"><td>Произвести 1 арест в КПЗ</td><td><input class="fraction-cb" data-with="1" data-without="1" type="checkbox"></td><td class="reward" data-with="1" data-without="1">4 BP</td></tr>
+      <tr class="fraction-row"><td>Выкупить двух человек из КПЗ</td><td><input class="fraction-cb" data-with="2" data-without="2" type="checkbox"></td><td class="reward" data-with="2" data-without="2">8 BP</td></tr>
+      <tr class="fraction-row"><td>Посадить траву в теплице</td><td><input class="fraction-cb" data-with="2" data-without="2" type="checkbox"></td><td class="reward" data-with="4" data-without="4">16 BP</td></tr>
+      <tr class="fraction-row"><td>Запустить переработку обезболивающих в лаборатории</td><td><input class="fraction-cb" data-with="2" data-without="2" type="checkbox"></td><td class="reward" data-with="4" data-without="4">16 BP</td></tr>
+    </tbody></table>
+  </div>
+</div>
+
+<div style="margin-top:12px;text-align:center;"><div style="margin-top:4px;font-size:0.9rem;color:#aaa;user-select:none;-webkit-user-select:none;cursor:default;">LIME - GTA 5 RP</div></div>
 </div>
 
 <script>
-  // ── Конфиг ──────────────────────────────────────────────────────
-  // Ищем серверы по подстроке в имени (регистр не важен)
-  const TARGETS = [
-    { key: 'delperro', nameContains: 'del perro' },
-    { key: 'lapuerta', nameContains: 'la puerta' },
+(function(){
+  // Autosave только для VIP и x2 чекбоксов — задачи управляются системой персонажей
+  const PREFIX = 'autosave::' + location.origin + '::';
+  const SELECTOR = 'input#vipCheckbox, input#x2Checkbox';
+  function keyFor(el){ return PREFIX + '#' + el.id; }
+  function getValue(el){ return el.checked ? '1' : '0'; }
+  // Не делаем restoreAll — это теперь делает loadState() с учётом персонажа
+  function bindAutosave(){
+    document.addEventListener('change', e=>{ const el=e.target; if(!el.matches(SELECTOR))return; try{localStorage.setItem(keyFor(el), getValue(el));}catch(_){} }, {passive:true});
+  }
+  bindAutosave();
+})();
+</script>
+
+<script>
+const storageKey = 'daily_tasks_done_v4_grid';
+const vipStorageKey = 'daily_tasks_vip_mode_v4';
+const x2StorageKey = 'daily_tasks_x2_mode_v4';
+
+// === ПЕРСОНАЖИ ===
+let currentChar = parseInt(localStorage.getItem('active_char') || '1');
+
+function charSuffix(n) { return n === 1 ? '' : '_char2'; }
+function getStorageKey()    { return storageKey + charSuffix(currentChar); }
+function getVipStorageKey() { return vipStorageKey + charSuffix(currentChar); }
+function getX2StorageKey()  { return x2StorageKey + charSuffix(currentChar); }
+
+function switchChar(n) {
+  if (n === currentChar) return;
+  // Сохраняем состояние текущего персонажа
+  saveStateForChar(currentChar);
+  currentChar = n;
+  localStorage.setItem('active_char', n);
+  updateCharUI();
+  loadState();
+}
+
+function updateCharUI() {
+  document.getElementById('charBtn1').classList.toggle('active', currentChar === 1);
+  document.getElementById('charBtn2').classList.toggle('active', currentChar === 2);
+  const icons = ['⚔️', '🛡️'];
+  const names = ['Персонаж 1', 'Персонаж 2'];
+  const idx = currentChar - 1;
+  document.getElementById('charIndicator').innerHTML = icons[idx] + ' &nbsp;' + names[idx];
+  // Цветовой акцент для персонажа 2
+  document.body.classList.toggle('char2-active', currentChar === 2);
+  updateCharProgressBars();
+}
+
+function getCharTaskProgress(charNum) {
+  const suffix = charNum === 1 ? '' : '_char2';
+  const key = storageKey + suffix;
+  let arr = null;
+  try { arr = JSON.parse(localStorage.getItem(key)); } catch(e){}
+  if (!Array.isArray(arr)) arr = [];
+  // online bubble
+  const onlineKey = key + '_online';
+  const onlineDone = localStorage.getItem(onlineKey) === 'true';
+  const allCheckboxes = qa('.tasks-column input[type="checkbox"]');
+  const total = allCheckboxes.length + 1; // +1 онлайн
+  const done = arr.filter(Boolean).length + (onlineDone ? 1 : 0);
+  return { done, total };
+}
+
+function updateCharProgressBars() {
+  for (let cn = 1; cn <= 2; cn++) {
+    const { done, total } = getCharTaskProgress(cn);
+    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+    const fill = document.getElementById('charFill' + cn);
+    const label = document.getElementById('charProgressLabel' + cn);
+    if (fill) fill.style.width = pct + '%';
+    if (label) label.textContent = done + ' / ' + total;
+  }
+}
+
+function updateTaskProgressBar() {
+  const allCbs = qa('.tasks-column input[type="checkbox"]');
+  const total = allCbs.length + 1; // +1 онлайн-задание
+  const cbOnlineEl = document.getElementById('cbOnline');
+  const onlineDone = cbOnlineEl ? cbOnlineEl.checked : false;
+  const done = allCbs.filter(cb => cb.checked).length + (onlineDone ? 1 : 0);
+  const pct = total > 0 ? (done / total) * 100 : 0;
+  const fill = document.getElementById('taskProgressFill');
+  const label = document.getElementById('taskProgressLabel');
+  if (fill) fill.style.width = pct.toFixed(1) + '%';
+  if (label) label.textContent = done + ' / ' + total + ' заданий';
+}
+
+function saveStateForChar(charNum) {
+  const suffix = charSuffix(charNum);
+  const arr = qa('.tasks-column input[type="checkbox"]').map(cb => !!cb.checked);
+  localStorage.setItem(storageKey + suffix, JSON.stringify(arr));
+  localStorage.setItem(vipStorageKey + suffix, JSON.stringify(!!vipCheckbox.checked));
+  localStorage.setItem(x2StorageKey + suffix, JSON.stringify(!!x2Checkbox.checked));
+  const cbOnlineEl = document.getElementById('cbOnline');
+  if (cbOnlineEl) localStorage.setItem(storageKey + suffix + '_online', cbOnlineEl.checked ? 'true' : 'false');
+}
+
+function q(sel){return document.querySelector(sel);} 
+function qa(sel){return Array.from(document.querySelectorAll(sel));}
+
+let checkboxes = qa('.tasks-column input[type="checkbox"]');
+let N = checkboxes.length;
+const vipCheckbox = q('#vipCheckbox');
+const x2Checkbox = q('#x2Checkbox');
+
+function getPairFromRewardCell(cell) {
+  const without = parseInt(cell.getAttribute('data-without') || '0', 10);
+  const withv = parseInt(cell.getAttribute('data-with') || without.toString(), 10);
+  return {a: without, b: withv};
+}
+function updateRewardCellsDisplay(showVip, x2) {
+  const rewardCells = qa('.tasks-column td.reward');
+  rewardCells.forEach(cell => {
+    const {a,b} = getPairFromRewardCell(cell);
+    let base = showVip ? b : a;
+    if (showVip && b === a) base = a * 2;
+    const displayVal = base * (x2 ? 2 : 1);
+    cell.textContent = displayVal + ' BP';
+  });
+  document.body.classList.toggle('vip-mode', !!showVip);
+  document.body.classList.toggle('x2-mode', !!x2);
+  const onlineBase = 2; 
+  const onlineBaseVip = vipCheckbox.checked ? onlineBase * 2 : onlineBase;
+  const onlineVal = onlineBaseVip * (x2Checkbox.checked ? 2 : 1);
+  const onlineElem = q('#onlineBp');
+  if (onlineElem) onlineElem.textContent = onlineVal + ' BP';
+}
+function computeTotals(showVip, x2) {
+  let sumSelectedTasks = 0;
+  let possibleTotalTasks = 0;
+  const rows = qa('.tasks-column tr');
+  rows.forEach(row => {
+    const rewardCell = row.querySelector('td.reward');
+    if (!rewardCell) return;
+    const {a,b} = getPairFromRewardCell(rewardCell);
+    let val = (showVip ? b : a);
+    if (showVip && b === a) val = a * 2;
+    val = val * (x2 ? 2 : 1);
+    const cb = row.querySelector('input[type="checkbox"]');
+    const isFraction = row.classList.contains('fraction-row');
+    if (cb && cb.checked) sumSelectedTasks += val;
+    possibleTotalTasks += val;
+  });
+  // Учитываем "3 часа в онлайне"
+  const onlineBase = 2;
+  const onlineVal = (showVip ? onlineBase * 2 : onlineBase) * (x2 ? 2 : 1);
+  const cbOnlineEl = q('#cbOnline');
+  if (cbOnlineEl && cbOnlineEl.checked) sumSelectedTasks += onlineVal;
+  possibleTotalTasks += onlineVal;
+  const totalDisplayVal = sumSelectedTasks;
+  const remaining = Math.max(0, possibleTotalTasks - sumSelectedTasks);
+  return {totalDisplayVal, remaining};
+}
+function refreshAll() {
+  checkboxes = qa('.tasks-column input[type="checkbox"]');
+  N = checkboxes.length;
+  const vipMode = !!JSON.parse(localStorage.getItem(getVipStorageKey()) || 'false');
+  const x2Mode = !!JSON.parse(localStorage.getItem(getX2StorageKey()) || 'false');
+  vipCheckbox.checked = vipMode; x2Checkbox.checked = x2Mode;
+  updateRewardCellsDisplay(vipMode, x2Mode);
+  const {totalDisplayVal, remaining} = computeTotals(vipMode, x2Mode);
+  q('#totalDisplay').textContent = totalDisplayVal;
+  q('#remainingDisplay').textContent = remaining;
+  qa('.tasks-column tr').forEach(row => {
+    const cb = row.querySelector('input[type="checkbox"]');
+    if (cb && cb.checked) row.classList.add('done'); else row.classList.remove('done');
+  });
+  // Обновляем оверлеи завершения столбцов
+  if (typeof checkColumnCompletion === 'function') checkColumnCompletion();
+  // Обновляем прогресс задач в карточке
+  if (typeof updateTaskProgressBar === 'function') updateTaskProgressBar();
+}
+function loadState() {
+  const raw = localStorage.getItem(getStorageKey());
+  let arr = null;
+  try { arr = JSON.parse(raw); } catch(e){ arr = null; }
+  if(!Array.isArray(arr) || arr.length !== N) arr = new Array(N).fill(false);
+  for(let i=0;i<N;i++){ const cb = checkboxes[i]; if (cb) cb.checked = !!arr[i]; }
+  const vipMode = !!JSON.parse(localStorage.getItem(getVipStorageKey()) || 'false');
+  const x2Mode = !!JSON.parse(localStorage.getItem(getX2StorageKey()) || 'false');
+  vipCheckbox.checked = vipMode; x2Checkbox.checked = x2Mode;
+  // Онлайн-пузырёк
+  const cbOnlineEl = document.getElementById('cbOnline');
+  if (cbOnlineEl) {
+    const onlineRaw = localStorage.getItem(getStorageKey() + '_online');
+    cbOnlineEl.checked = onlineRaw === 'true';
+    const bubble = document.getElementById('onlineBubble');
+    if (bubble) bubble.classList.toggle('done', cbOnlineEl.checked);
+  }
+  refreshAll();
+}
+function saveState() {
+  const arr = qa('.tasks-column input[type="checkbox"]').map(cb => !!cb.checked);
+  localStorage.setItem(getStorageKey(), JSON.stringify(arr));
+  localStorage.setItem(getVipStorageKey(), JSON.stringify(!!vipCheckbox.checked));
+  localStorage.setItem(getX2StorageKey(), JSON.stringify(!!x2Checkbox.checked));
+  // Онлайн-пузырёк
+  const cbOnlineEl = document.getElementById('cbOnline');
+  if (cbOnlineEl) localStorage.setItem(getStorageKey() + '_online', cbOnlineEl.checked ? 'true' : 'false');
+  refreshAll();
+}
+function attachCheckboxListeners(){
+  qa('.tasks-column input[type="checkbox"]').forEach(cb => {
+    cb.removeEventListener('change', onCheckChange);
+    cb.addEventListener('change', onCheckChange);
+  });
+}
+function onCheckChange(e){
+  const cb = e.target;
+  const row = cb.closest('tr');
+  if (row) row.classList.toggle('done', cb.checked);
+  saveState();
+}
+function attachRowClickListeners(){
+  qa('.tasks-column tr').forEach(row => {
+    row.removeEventListener('click', onRowClick);
+    row.addEventListener('click', onRowClick);
+  });
+}
+function onRowClick(e){
+  if (e.target.closest('input[type="checkbox"]')) return;
+  const row = e.currentTarget;
+  const cb = row.querySelector('input[type="checkbox"]');
+  if (!cb) return;
+  cb.checked = !cb.checked;
+  cb.dispatchEvent(new Event('change', { bubbles: true }));
+}
+attachCheckboxListeners();
+attachRowClickListeners();
+vipCheckbox.addEventListener('change', ()=>{ localStorage.setItem(getVipStorageKey(), JSON.stringify(!!vipCheckbox.checked)); refreshAll(); });
+x2Checkbox.addEventListener('change', ()=>{ localStorage.setItem(getX2StorageKey(), JSON.stringify(!!x2Checkbox.checked)); refreshAll(); });
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  qa('.tasks-column input[type="checkbox"]').forEach(cb => cb.checked = false);
+  const bubble = document.getElementById('onlineBubble');
+  if (bubble) bubble.classList.remove('done');
+  const cbOnlineEl = document.getElementById('cbOnline');
+  if (cbOnlineEl) cbOnlineEl.checked = false;
+  saveState();
+});
+loadState();
+
+// ── Проверка завершения каждого столбца ──
+function checkColumnCompletion() {
+  const columns = [
+    { colId: 'col-easy', overlayId: 'overlay-col-easy' },
+    { colId: 'col-medium', overlayId: 'overlay-col-medium' },
+    { colId: 'col-joint', overlayId: 'overlay-col-joint' },
+    { colId: 'col-avoid', overlayId: 'overlay-col-avoid' },
+    { colId: 'col-fraction', overlayId: 'overlay-col-fraction' },
   ];
-  const REFRESH_SEC = 5 * 60;
-  const MASTERLIST  = 'https://rage.mp/masterlist/';
+  columns.forEach(({ colId, overlayId }) => {
+    const col = document.getElementById(colId);
+    const overlay = document.getElementById(overlayId);
+    if (!col || !overlay) return;
+    const cbs = Array.from(col.querySelectorAll('.tasks-column input[type="checkbox"]'));
+    // для средних — учитываем онлайн-пузырёк отдельно
+    const extraCb = colId === 'col-medium' ? document.getElementById('cbOnline') : null;
+    const allCbs = extraCb ? [...cbs, extraCb] : cbs;
+    if (allCbs.length > 0 && allCbs.every(cb => cb.checked)) {
+      overlay.classList.add('visible');
+    } else {
+      overlay.classList.remove('visible');
+    }
+  });
+}
 
-  // ── Хелперы ─────────────────────────────────────────────────────
-  function fmt(n) {
-    return n >= 1000
-      ? Math.floor(n / 1000) + '\u00a0' + String(n % 1000).padStart(3, '0')
-      : String(n);
+// Вешаем checkColumnCompletion на каждое изменение чекбокса
+function attachColumnCompletionListeners() {
+  document.querySelectorAll('.tasks-column input[type="checkbox"]').forEach(cb => {
+    cb.removeEventListener('change', checkColumnCompletion);
+    cb.addEventListener('change', checkColumnCompletion);
+  });
+  const cbOnlineEl = document.getElementById('cbOnline');
+  if (cbOnlineEl) {
+    cbOnlineEl.removeEventListener('change', checkColumnCompletion);
+    cbOnlineEl.addEventListener('change', checkColumnCompletion);
+  }
+}
+attachColumnCompletionListeners();
+checkColumnCompletion();
+updateCharUI();
+
+// ── Сброс прогресса отдельного столбца ──
+document.querySelectorAll('.col-reset-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const colId = btn.dataset.target;
+    const col = document.getElementById(colId);
+    if (!col) return;
+    col.querySelectorAll('.tasks-column input[type="checkbox"]').forEach(cb => {
+      cb.checked = false;
+      cb.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    // Для средних — сбрасываем онлайн-пузырёк
+    if (colId === 'col-medium') {
+      const cbOnlineEl = document.getElementById('cbOnline');
+      if (cbOnlineEl) {
+        cbOnlineEl.checked = false;
+        cbOnlineEl.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+    saveState();
+    checkColumnCompletion();
+  });
+});
+
+// Онлайн-задание: зелёная подсветка при выполнении + клик по всему пузырьку
+const cbOnline = document.getElementById('cbOnline');
+const onlineBubble = document.getElementById('onlineBubble');
+if (cbOnline && onlineBubble) {
+  function updateOnlineDone() {
+    onlineBubble.classList.toggle('done', cbOnline.checked);
+  }
+  cbOnline.addEventListener('change', () => { updateOnlineDone(); refreshAll(); });
+  onlineBubble.addEventListener('click', (e) => {
+    if (e.target === cbOnline) return;
+    cbOnline.checked = !cbOnline.checked;
+    cbOnline.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  updateOnlineDone();
+}
+
+// Кнопки-фильтры категорий
+const grid = document.getElementById('tasksGrid');
+function updateGridCols() {
+  const total = document.querySelectorAll('.grid > .column').length;
+  const hidden = document.querySelectorAll('.grid > .column.hidden').length;
+  const visible = Math.max(3, total - hidden);
+  grid.style.setProperty('--visible-cols', visible);
+}
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const colId = btn.dataset.col;
+    const col = document.getElementById(colId);
+    if (!col) return;
+    const isActive = btn.classList.contains('active');
+    btn.classList.toggle('active', !isActive);
+    if (isActive) {
+      // Hide: fade out then display:none
+      col.style.opacity = '0';
+      col.style.pointerEvents = 'none';
+      setTimeout(() => {
+        col.classList.add('hidden');
+        col.style.opacity = '';
+        col.style.pointerEvents = '';
+        updateGridCols();
+      }, 280);
+    } else {
+      // Show: remove hidden, then fade in
+      col.classList.remove('hidden');
+      updateGridCols();
+      // Force reflow
+      col.getBoundingClientRect();
+      col.style.opacity = '0';
+      requestAnimationFrame(() => {
+        col.style.opacity = '';
+      });
+    }
+  });
+});
+updateGridCols();
+
+// Дата
+(function updateDate() {
+  const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  const days = ['ВОСКРЕСЕНЬЕ','ПОНЕДЕЛЬНИК','ВТОРНИК','СРЕДА','ЧЕТВЕРГ','ПЯТНИЦА','СУББОТА'];
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function tick() {
+    const now = new Date();
+    const dayName = document.getElementById('dateDayName');
+    const mainText = document.getElementById('dateMainText');
+    if (!mainText) return;
+    if (dayName) dayName.textContent = days[now.getDay()];
+    mainText.textContent = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
   }
 
-  function setLoading(key) {
-    document.getElementById('dot-'   + key).className = 'badge-dot loading';
-    document.getElementById('count-' + key).classList.add('fade');
+  tick();
+})();
+</script>
+<style>
+.date-online {
+  font-family: monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: rgba(100, 255, 140, 0.55);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  justify-content: center;
+  margin-top: 1px;
+}
+.online-dot-mini {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(80, 255, 120, 0.75);
+  box-shadow: 0 0 5px rgba(57,255,100,0.8);
+  animation: dotPulse 2s ease-in-out infinite alternate;
+  flex-shrink: 0;
+}
+@keyframes dotPulse {
+  0%   { box-shadow: 0 0 3px rgba(57,255,100,0.6); opacity: 0.8; }
+  100% { box-shadow: 0 0 8px rgba(57,255,100,1); opacity: 1; }
+}
+body.char2-active .date-online { color: rgba(100, 255, 140, 0.55); }
+
+/* Онлайн-счётчик — интерактивный */
+.date-online {
+  position: relative;
+  cursor: default;
+  pointer-events: auto !important;
+}
+.date-online:hover {
+  color: rgba(130, 255, 170, 0.85);
+}
+
+/* Попап с никами */
+.online-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 160px;
+  max-width: 260px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(8, 16, 28, 0.94);
+  backdrop-filter: blur(18px) saturate(0.7);
+  -webkit-backdrop-filter: blur(18px) saturate(0.7);
+  border: 1px solid rgba(80, 255, 130, 0.18);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.55),
+    0 0 0 1px rgba(60,255,110,0.08) inset,
+    0 0 24px rgba(57,255,100,0.06);
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, visibility 0.18s ease, transform 0.18s ease;
+  transform: translateX(-50%) translateY(4px);
+  white-space: nowrap;
+}
+.date-online:hover .online-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+.online-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(8,16,28,0.94);
+}
+.online-tooltip-title {
+  font-family: monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(80, 255, 130, 0.45);
+  margin-bottom: 8px;
+  text-align: center;
+}
+.online-tooltip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.online-tooltip-nick {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(200, 255, 220, 0.88);
+}
+.online-tooltip-nick::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(57, 255, 100, 0.85);
+  box-shadow: 0 0 6px rgba(57,255,100,0.9);
+  flex-shrink: 0;
+  animation: dotPulse 2s ease-in-out infinite alternate;
+}
+.online-tooltip-empty {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: rgba(150,180,160,0.45);
+  letter-spacing: 2px;
+  text-align: center;
+}
+</style>
+
+<script type="module">
+  import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue, set, remove, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  // Переиспользуем уже инициализированное приложение authApp
+  let app;
+  try { app = getApp("authApp"); } catch(e) {
+    app = initializeApp({
+      apiKey: "AIzaSyCMVd8slq6gc6lD1noTW0DDW8VkALJcZao",
+      authDomain: "bonuspoint-lime.firebaseapp.com",
+      databaseURL: "https://bonuspoint-lime-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "bonuspoint-lime",
+      storageBucket: "bonuspoint-lime.firebasestorage.app",
+      messagingSenderId: "647315774952",
+      appId: "1:647315774952:web:b8269372e8abf5d97f185d"
+    }, "authApp");
   }
 
-  function setData(key, players, maxplayers) {
-    const dot   = document.getElementById('dot-'   + key);
-    const count = document.getElementById('count-' + key);
-    const bar   = document.getElementById('bar-'   + key);
-    const maxEl = document.getElementById('max-'   + key);
+  const db = getDatabase(app);
+  const auth = getAuth(app);
+  const onlineRef = ref(db, 'online');
 
-    count.classList.add('fade');
-    setTimeout(() => {
-      count.textContent = fmt(players);
-      count.classList.remove('fade');
-    }, 250);
-
-    bar.style.width = Math.min(100, Math.round(players / maxplayers * 100)) + '%';
-    maxEl.textContent = 'из ' + fmt(maxplayers) + ' макс.';
-
-    dot.className = 'badge-dot';   // убираем спиннер, включаем blink
+  function getNick(email) {
+    if (!email) return '???';
+    return email.split('@')[0].toUpperCase();
   }
 
-  function setError(key) {
-    document.getElementById('dot-'   + key).className = 'badge-dot';
-    document.getElementById('count-' + key).classList.remove('fade');
-  }
+  function updateTooltip(snapshot) {
+    const listEl = document.getElementById('onlineNickList');
+    const countEl = document.getElementById('onlineCount');
+    if (!listEl || !countEl) return;
 
-  // ── Основной запрос ─────────────────────────────────────────────
-  async function fetchAll() {
-    TARGETS.forEach(t => setLoading(t.key));
-    document.getElementById('errorHint').textContent = '';
-
-    let data;
-    try {
-      const res = await fetch(MASTERLIST);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      data = await res.json();
-    } catch (err) {
-      console.error('Masterlist fetch error:', err);
-      TARGETS.forEach(t => setError(t.key));
-      document.getElementById('errorHint').textContent =
-        'Не удалось получить данные с rage.mp/masterlist. ' +
-        'Возможно, сайт блокирует прямые запросы из браузера (CORS). ' +
-        'Для работы плашки на реальном сайте потребуется небольшой прокси на сервере.';
-      updateSubtitle(false);
+    if (!snapshot.exists()) {
+      countEl.textContent = '0';
+      listEl.innerHTML = '<div class="online-tooltip-empty">никого нет</div>';
       return;
     }
 
-    // data — объект вида { "ip:port": { name, players, maxplayers, ... }, ... }
-    // Ищем нужные серверы по имени
-    const found = {};
-    for (const [ip, srv] of Object.entries(data)) {
-      if (!srv || typeof srv.name !== 'string') continue;
-      const nameLower = srv.name.toLowerCase();
-      for (const t of TARGETS) {
-        if (!found[t.key] && nameLower.includes(t.nameContains)) {
-          found[t.key] = srv;
-        }
-      }
+    const data = snapshot.val();
+    const entries = Object.values(data);
+    const count = entries.length;
+    countEl.textContent = count;
+
+    if (count === 0) {
+      listEl.innerHTML = '<div class="online-tooltip-empty">никого нет</div>';
+      return;
     }
 
-    let anyMissing = false;
-    for (const t of TARGETS) {
-      if (found[t.key]) {
-        setData(t.key, found[t.key].players ?? 0, found[t.key].maxplayers ?? 1300);
-      } else {
-        setError(t.key);
-        anyMissing = true;
-        console.warn('Сервер не найден в мастерлисте:', t.nameContains);
-      }
-    }
-
-    if (anyMissing) {
-      document.getElementById('errorHint').textContent =
-        'Один или несколько серверов не найдены в мастерлисте. ' +
-        'Проверьте написание в настройках.';
-    }
-
-    updateSubtitle(true);
+    listEl.innerHTML = entries
+      .map(e => `<div class="online-tooltip-nick">${e.nick || '???'}</div>`)
+      .join('');
   }
 
-  function updateSubtitle(ok) {
-    const now = new Date();
-    const t = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-    document.getElementById('lastUpdated').textContent =
-      ok ? 'Обновлено в ' + t : 'Ошибка обновления в ' + t;
+  // Слушаем онлайн в реальном времени
+  onValue(onlineRef, (snapshot) => {
+    updateTooltip(snapshot);
+  });
+
+  // Регистрируем себя по UID (уникальный пользователь, не устройство)
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) return;
+    const uid = user.uid;
+    const nick = getNick(user.email);
+    const userRef = ref(db, `online/${uid}`);
+
+    await set(userRef, { nick, t: serverTimestamp() });
+    onDisconnect(userRef).remove();
+  });
+</script>
+
+<script type="module">
+// ── JEDI MODAL + LIVE LEADERBOARD ──
+import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+let _jediDbApp;
+try { _jediDbApp = getApp("authApp"); } catch(e) {
+  _jediDbApp = initializeApp({
+    apiKey: "AIzaSyCMVd8slq6gc6lD1noTW0DDW8VkALJcZao",
+    authDomain: "bonuspoint-lime.firebaseapp.com",
+    databaseURL: "https://bonuspoint-lime-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "bonuspoint-lime",
+    storageBucket: "bonuspoint-lime.firebasestorage.app",
+    messagingSenderId: "647315774952",
+    appId: "1:647315774952:web:b8269372e8abf5d97f185d"
+  }, "authApp");
+}
+const _jediDb = getDatabase(_jediDbApp);
+
+// Live leaderboard for modal
+onValue(ref(_jediDb, 'jedi_runner/leaderboard'), snap => {
+  const data = snap.val() || {};
+  const entries = Object.values(data).sort((a,b) => b.score - a.score).slice(0, 15);
+  const list = document.getElementById('jediLbList');
+  if (!list) return;
+  if (!entries.length) { list.innerHTML = '<div class="jedi-lb-empty">РЕКОРДОВ НЕТ</div>'; return; }
+  list.innerHTML = entries.map((e,i) => {
+    const rc = i===0?'gold':i===1?'silver':i===2?'bronze':'';
+    const rl = i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
+    return `<div class="jedi-lb-entry">
+      <span class="jedi-lb-rank ${rc}">${rl}</span>
+      <span class="jedi-lb-name">${e.nick}</span>
+      <span class="jedi-lb-score">${e.score}</span>
+    </div>`;
+  }).join('');
+});
+
+window.openJediModal = function() {
+  const backdrop = document.getElementById('jediModalBackdrop');
+  const frame = document.getElementById('jediFrame');
+  // Set src only once to avoid reload on reopen
+  if (!frame.src || frame.src === window.location.href) {
+    frame.src = '/jedi-runner.html';
   }
+  backdrop.classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
 
-  // ── Таймер ──────────────────────────────────────────────────────
-  let secondsLeft = REFRESH_SEC;
-  const CIRCUM = 2 * Math.PI * 6; // ≈ 37.7
+window.closeJediModal = function(e) {
+  // Close only if clicking backdrop itself
+  if (e.target === document.getElementById('jediModalBackdrop')) {
+    closeJediModalDirect();
+  }
+};
 
-  setInterval(() => {
-    secondsLeft--;
-    if (secondsLeft <= 0) {
-      secondsLeft = REFRESH_SEC;
-      fetchAll();
-    }
-    const m = Math.floor(secondsLeft / 60);
-    const s = secondsLeft % 60;
-    document.getElementById('refreshCountdown').textContent =
-      'обновление через ' + m + ':' + String(s).padStart(2, '0');
+window.closeJediModalDirect = function() {
+  document.getElementById('jediModalBackdrop').classList.remove('open');
+  document.body.style.overflow = '';
+};
 
-    const offset = CIRCUM * (1 - secondsLeft / REFRESH_SEC);
-    document.getElementById('refreshProgress').style.strokeDashoffset =
-      CIRCUM - offset;
-  }, 1000);
-
-  // ── Старт ───────────────────────────────────────────────────────
-  fetchAll();
+// ESC to close
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeJediModalDirect();
+});
 </script>
 </body>
 </html>
