@@ -30,7 +30,7 @@
   h1 { display: none; }
   .title-capsule {
     text-align: center;
-    margin: 0 0 18px 0;
+    margin: 0 0 8px 0;
   }
   .title-capsule-inner {
     display: inline-block;
@@ -84,7 +84,33 @@
   .controls { display:flex; gap:12px; align-items:center; flex-wrap:wrap; background: rgba(10,20,40,0.75); backdrop-filter: blur(12px); border: 1px solid rgba(0,255,255,0.4); border-radius: 60px; padding: 12px 24px; margin-bottom: 24px; box-shadow: 0 0 15px rgba(0,255,255,0.2); }
   .controls button:not(.char-btn) { background: linear-gradient(135deg, #ff3366, #cc0044); border: none; color: white; padding: 10px 24px; border-radius: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 0 6px #ff3366; user-select: none; }
   .controls button:not(.char-btn):hover { transform: scale(1.05); box-shadow: 0 0 18px #ff3366; background: linear-gradient(135deg, #ff5577, #ee2255); }
-  .center-actions { display: flex; align-items: center; gap: 20px; width: 100%; }
+  .center-actions {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+  }
+  .left-group {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .right-group {
+    flex-wrap: wrap;
+    justify-self: end;
+  }
+  @media (max-width: 1300px) {
+    .center-actions {
+      grid-template-columns: 1fr;
+    }
+    .left-group, .right-group, .date-display {
+      justify-self: center;
+      justify-content: center;
+    }
+  }
+
   /* === VIP & X2 TOGGLE BUTTONS === */
   .toggle-switch { display: inline-flex; align-items: center; gap: 0; cursor: pointer; }
   .toggle-switch input { display: none; }
@@ -170,9 +196,6 @@
 
   .switch-label { display: none; }
   .date-display {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
     pointer-events: none;
     display: flex;
     flex-direction: column;
@@ -181,6 +204,10 @@
     user-select: none;
     cursor: default;
     white-space: nowrap;
+    padding: 4px 14px;
+    border-radius: 40px;
+    border: 1px solid transparent;
+    background: transparent;
   }
   .date-display .date-day {
     font-family: monospace;
@@ -969,11 +996,15 @@ body.char2-active .filter-btn.active[data-col="col-fraction"]:hover {
 <!-- ██ PIN LOCK SCREEN ██ -->
 <div id="pinOverlay" style="display:flex;">
   <div class="pin-bg"></div>
-  <div class="pin-box">
+  <div class="pin-box" id="loadingBox">
+    <div class="pin-loader"></div>
+    <div class="pin-sub">ЗАГРУЗКА...</div>
+  </div>
+  <div class="pin-box" id="loginBox" style="display:none;">
     <div class="pin-title">⬡ ДОСТУП ЗАКРЫТ ⬡</div>
     <div class="pin-sub">ВХОД В СИСТЕМУ</div>
     <div class="auth-form">
-      <input type="email" id="authEmail" class="auth-input" placeholder="ПОЧТА" autocomplete="username">
+      <input type="text" id="authEmail" class="auth-input" placeholder="НИКНЕЙМ" autocomplete="username">
       <input type="password" id="authPass" class="auth-input" placeholder="КОД ДОСТУПА" autocomplete="current-password">
     </div>
     <div class="pin-error" id="pinError"></div>
@@ -1022,6 +1053,17 @@ body.char2-active .filter-btn.active[data-col="col-fraction"]:hover {
 @keyframes boxPulse {
   0%   { box-shadow: 0 0 0 1px rgba(0,255,255,0.15), 0 0 40px rgba(0,255,255,0.18), 0 0 80px rgba(180,0,255,0.12), 0 0 120px rgba(255,200,0,0.06), inset 0 1px 0 rgba(255,255,255,0.06); }
   100% { box-shadow: 0 0 0 1px rgba(0,255,255,0.35), 0 0 60px rgba(0,255,255,0.32), 0 0 110px rgba(180,0,255,0.22), 0 0 160px rgba(255,200,0,0.10), inset 0 1px 0 rgba(255,255,255,0.08); }
+}
+.pin-loader {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 3px solid rgba(0,255,255,0.18);
+  border-top-color: rgba(0,220,255,0.85);
+  animation: pinSpin 0.9s linear infinite;
+}
+@keyframes pinSpin {
+  to { transform: rotate(360deg); }
 }
 .pin-title {
   font-size: 1.5rem;
@@ -1132,8 +1174,8 @@ body.char2-active .filter-btn.active[data-col="col-fraction"]:hover {
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getDatabase, ref, get, set as dbSet } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCMVd8slq6gc6lD1noTW0DDW8VkALJcZao",
@@ -1150,15 +1192,65 @@ body.char2-active .filter-btn.active[data-col="col-fraction"]:hover {
   const db = getDatabase(authApp);
   setPersistence(auth, browserLocalPersistence);
 
-  // Expose Firebase DB and user UID globally for the main script
-  window._farmDB = db;
-  window._farmRef = ref;
-  window._farmSet = set;
-  window._farmGet = get;
-  window._farmUID = null;
-  window._farmDBReady = false;
+  // === Синхронизация прогресса между устройствами через Firebase ===
+  const SYNC_KEYS = [
+    'daily_tasks_done_v4_grid',
+    'daily_tasks_done_v4_grid_char2',
+    'daily_tasks_done_v4_grid_online',
+    'daily_tasks_done_v4_grid_char2_online',
+    'daily_tasks_vip_mode_v4',
+    'daily_tasks_vip_mode_v4_char2',
+    'daily_tasks_x2_mode_v4',
+    'daily_tasks_x2_mode_v4_char2',
+    'active_char'
+  ];
+  const SYNC_KEY_SET = new Set(SYNC_KEYS);
+  let currentUid = null;
+  let syncTimer = null;
+
+  const _origSetItem = localStorage.setItem.bind(localStorage);
+  localStorage.setItem = function(key, value) {
+    _origSetItem(key, value);
+    if (SYNC_KEY_SET.has(key) && currentUid) {
+      clearTimeout(syncTimer);
+      syncTimer = setTimeout(pushStateToCloud, 700);
+    }
+  };
+
+  function collectLocalState() {
+    const data = {};
+    SYNC_KEYS.forEach(k => {
+      const v = localStorage.getItem(k);
+      if (v !== null) data[k] = v;
+    });
+    return data;
+  }
+
+  async function pushStateToCloud() {
+    if (!currentUid) return;
+    try {
+      await dbSet(ref(db, 'users/' + currentUid + '/state'), collectLocalState());
+    } catch(e) {}
+  }
+
+  async function pullStateFromCloud(uid) {
+    try {
+      const snap = await get(ref(db, 'users/' + uid + '/state'));
+      if (snap.exists()) {
+        const data = snap.val();
+        SYNC_KEYS.forEach(k => {
+          if (data[k] !== undefined) _origSetItem(k, data[k]);
+          else localStorage.removeItem(k);
+        });
+        return true;
+      }
+    } catch(e) {}
+    return false;
+  }
 
   const overlay = document.getElementById('pinOverlay');
+  const loadingBox = document.getElementById('loadingBox');
+  const loginBox = document.getElementById('loginBox');
   const emailInput = document.getElementById('authEmail');
   const passInput = document.getElementById('authPass');
   const errEl = document.getElementById('pinError');
@@ -1166,25 +1258,53 @@ body.char2-active .filter-btn.active[data-col="col-fraction"]:hover {
 
   document.body.style.overflow = 'hidden';
 
-  onAuthStateChanged(auth, (user) => {
+  function getDisplayName(email) {
+    if (!email) return '';
+    const local = email.split('@')[0].toUpperCase();
+    return local;
+  }
+
+  onAuthStateChanged(auth, async (user) => {
     if (user) {
-      window._farmUID = user.uid;
-      window._farmDBReady = true;
       overlay.style.animation = 'fadeOutOverlay 0.5s ease forwards';
       setTimeout(() => {
         overlay.style.display = 'none';
         document.body.style.overflow = '';
-        // Load state from Firebase after auth
-        if (typeof window._farmLoadState === 'function') window._farmLoadState();
       }, 500);
+      const nameEl = document.getElementById('userNameDisplay');
+      if (nameEl) nameEl.textContent = getDisplayName(user.email);
+
+      currentUid = user.uid;
+      const syncFlag = 'cloud_synced_' + user.uid;
+      if (sessionStorage.getItem(syncFlag) !== '1') {
+        const hadCloud = await pullStateFromCloud(user.uid);
+        sessionStorage.setItem(syncFlag, '1');
+        if (hadCloud) {
+          location.reload();
+          return;
+        } else {
+          pushStateToCloud();
+        }
+      }
     } else {
-      window._farmUID = null;
-      window._farmDBReady = false;
+      loadingBox.style.display = 'none';
+      loginBox.style.display = 'flex';
       overlay.style.animation = '';
       overlay.style.display = 'flex';
       document.body.style.overflow = 'hidden';
+      const nameEl = document.getElementById('userNameDisplay');
+      if (nameEl) nameEl.textContent = '';
+      currentUid = null;
     }
   });
+
+  // Logout button
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      signOut(auth);
+    });
+  }
 
   function clearError() {
     errEl.textContent = '';
@@ -1203,13 +1323,14 @@ body.char2-active .filter-btn.active[data-col="col-fraction"]:hover {
   }
 
   function tryLogin() {
-    const email = emailInput.value.trim();
+    let email = emailInput.value.trim();
     const pass = passInput.value;
     clearError();
     if (!email || !pass) {
       showError('✕ ЗАПОЛНИТЕ ВСЕ ПОЛЯ');
       return;
     }
+    if (!email.includes('@')) email = email + '@lime.ru';
     submitBtn.disabled = true;
     signInWithEmailAndPassword(auth, email, pass)
       .catch(() => {
@@ -1368,6 +1489,7 @@ body.char2-active .filter-btn.active[data-col="col-fraction"]:hover {
 
 <div class="controls" style="position:relative;">
   <div class="center-actions">
+    <div class="left-group">
     <button id="resetBtn">⟳ Сбросить задания</button>
     <label class="toggle-switch">
       <input id="vipCheckbox" type="checkbox">
@@ -1379,12 +1501,18 @@ body.char2-active .filter-btn.active[data-col="col-fraction"]:hover {
       <span class="switch-slider"></span>
       <span class="toggle-btn toggle-btn-x2">✨ Акция x2</span>
     </label>
+    </div>
     <div class="date-display" id="currentDate">
       <span class="date-day" id="dateDayName"></span>
       <span class="date-main" id="dateMainText">—</span>
-      <span class="date-online"><span class="online-dot-mini"></span><span id="onlineCount">—</span> онлайн</span>
+      <span class="date-online"><span class="online-dot-mini"></span><span id="onlineCount">—</span> онлайн
+        <div class="online-tooltip" id="onlineTooltip">
+          <div class="online-tooltip-title">В сети сейчас</div>
+          <div class="online-tooltip-list" id="onlineNickList"><div class="online-tooltip-empty">...</div></div>
+        </div>
+      </span>
     </div>
-    <div style="display:flex; align-items:center; margin-left:auto; gap: 12px;">
+    <div class="right-group" style="display:flex; align-items:center; gap: 14px;">
       <div class="char-switcher">
         <button class="char-btn active" id="charBtn1" onclick="switchChar(1)">
           <span class="char-label">Персонаж 1</span>
@@ -1393,6 +1521,47 @@ body.char2-active .filter-btn.active[data-col="col-fraction"]:hover {
           <span class="char-label">Персонаж 2</span>
         </button>
       </div>
+      <span id="userNameDisplay" style="
+        font-family: monospace;
+        font-size: 1.15rem;
+        font-weight: 900;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        background: linear-gradient(135deg, #00eeff, #cc44ff, #ffdd00);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        filter: drop-shadow(0 0 10px rgba(0,220,255,0.6));
+        user-select: none;
+        cursor: default;
+        white-space: nowrap;
+      "></span>
+      <button id="logoutBtn" title="Выйти из аккаунта" style="
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: linear-gradient(135deg, rgba(255,50,50,0.12), rgba(180,0,0,0.10));
+        border: 1.5px solid rgba(255,80,80,0.4);
+        color: rgba(255,120,120,0.85);
+        padding: 7px 16px;
+        border-radius: 40px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        cursor: pointer;
+        user-select: none;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        box-shadow: 0 0 8px rgba(255,50,50,0.12);
+      " onmouseover="this.style.boxShadow='0 0 18px rgba(255,50,50,0.4)';this.style.borderColor='rgba(255,80,80,0.7)';this.style.color='#ff9999';" onmouseout="this.style.boxShadow='0 0 8px rgba(255,50,50,0.12)';this.style.borderColor='rgba(255,80,80,0.4)';this.style.color='rgba(255,120,120,0.85)';">
+        <svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.9;flex-shrink:0;">
+          <rect x="0" y="0.5" width="14" height="1.5" rx="0.75" fill="currentColor"/>
+          <rect x="0" y="5" width="14" height="1.5" rx="0.75" fill="currentColor"/>
+          <rect x="0" y="9.5" width="14" height="1.5" rx="0.75" fill="currentColor"/>
+        </svg>
+        Выйти
+      </button>
     </div>
   </div>
 </div>
@@ -1550,11 +1719,22 @@ body.char2-active .filter-btn.active[data-col="col-fraction"]:hover {
   </div>
 </div>
 
-<div style="margin-top:12px;text-align:center;"><div style="margin-top:4px;font-size:0.9rem;color:#aaa;">LIME - GTA 5 RP</div></div>
+<div style="margin-top:12px;text-align:center;"><div style="margin-top:4px;font-size:0.9rem;color:#aaa;user-select:none;-webkit-user-select:none;cursor:default;">LIME - GTA 5 RP</div></div>
 </div>
 
 <script>
-// VIP/x2 autosave теперь через Firebase в saveState — этот блок оставлен пустым
+(function(){
+  // Autosave только для VIP и x2 чекбоксов — задачи управляются системой персонажей
+  const PREFIX = 'autosave::' + location.origin + '::';
+  const SELECTOR = 'input#vipCheckbox, input#x2Checkbox';
+  function keyFor(el){ return PREFIX + '#' + el.id; }
+  function getValue(el){ return el.checked ? '1' : '0'; }
+  // Не делаем restoreAll — это теперь делает loadState() с учётом персонажа
+  function bindAutosave(){
+    document.addEventListener('change', e=>{ const el=e.target; if(!el.matches(SELECTOR))return; try{localStorage.setItem(keyFor(el), getValue(el));}catch(_){} }, {passive:true});
+  }
+  bindAutosave();
+})();
 </script>
 
 <script>
@@ -1563,243 +1743,22 @@ const vipStorageKey = 'daily_tasks_vip_mode_v4';
 const x2StorageKey = 'daily_tasks_x2_mode_v4';
 
 // === ПЕРСОНАЖИ ===
-let currentChar = 1;
+let currentChar = parseInt(localStorage.getItem('active_char') || '1');
 
 function charSuffix(n) { return n === 1 ? '' : '_char2'; }
 function getStorageKey()    { return storageKey + charSuffix(currentChar); }
 function getVipStorageKey() { return vipStorageKey + charSuffix(currentChar); }
 function getX2StorageKey()  { return x2StorageKey + charSuffix(currentChar); }
 
-// === FIREBASE HELPERS ===
-function fbPath(key) {
-  const uid = window._farmUID;
-  if (!uid) return null;
-  return 'users/' + uid + '/progress/' + key;
-}
-async function fbSet(key, value) {
-  const path = fbPath(key);
-  if (!path || !window._farmDB) return;
-  try { await window._farmSet(window._farmRef(window._farmDB, path), value); } catch(e) { console.warn('fbSet error', e); }
-}
-async function fbGet(key) {
-  const path = fbPath(key);
-  if (!path || !window._farmDB) return null;
-  try {
-    const snap = await window._farmGet(window._farmRef(window._farmDB, path));
-    return snap.exists() ? snap.val() : null;
-  } catch(e) { console.warn('fbGet error', e); return null; }
-}
-
 function switchChar(n) {
   if (n === currentChar) return;
+  // Сохраняем состояние текущего персонажа
   saveStateForChar(currentChar);
   currentChar = n;
+  localStorage.setItem('active_char', n);
   updateCharUI();
   loadState();
 }
-
-function updateCharUI() {
-  document.getElementById('charBtn1').classList.toggle('active', currentChar === 1);
-  document.getElementById('charBtn2').classList.toggle('active', currentChar === 2);
-  const icons = ['⚔️', '🛡️'];
-  const names = ['Персонаж 1', 'Персонаж 2'];
-  const idx = currentChar - 1;
-  document.getElementById('charIndicator').innerHTML = icons[idx] + ' &nbsp;' + names[idx];
-  document.body.classList.toggle('char2-active', currentChar === 2);
-  updateCharProgressBars();
-}
-
-async function getCharTaskProgress(charNum) {
-  const suffix = charSuffix(charNum);
-  const key = storageKey + suffix;
-  let arr = await fbGet(key);
-  if (!Array.isArray(arr)) arr = [];
-  const onlineDone = await fbGet(key + '_online') === true;
-  const allCheckboxes = qa('.tasks-column input[type="checkbox"]');
-  const total = allCheckboxes.length + 1;
-  const done = arr.filter(Boolean).length + (onlineDone ? 1 : 0);
-  return { done, total };
-}
-
-async function updateCharProgressBars() {
-  for (let cn = 1; cn <= 2; cn++) {
-    const { done, total } = await getCharTaskProgress(cn);
-    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-    const fill = document.getElementById('charFill' + cn);
-    const label = document.getElementById('charProgressLabel' + cn);
-    if (fill) fill.style.width = pct + '%';
-    if (label) label.textContent = done + ' / ' + total;
-  }
-}
-
-function updateTaskProgressBar() {
-  const allCbs = qa('.tasks-column input[type="checkbox"]');
-  const total = allCbs.length + 1;
-  const cbOnlineEl = document.getElementById('cbOnline');
-  const onlineDone = cbOnlineEl ? cbOnlineEl.checked : false;
-  const done = allCbs.filter(cb => cb.checked).length + (onlineDone ? 1 : 0);
-  const pct = total > 0 ? (done / total) * 100 : 0;
-  const fill = document.getElementById('taskProgressFill');
-  const label = document.getElementById('taskProgressLabel');
-  if (fill) fill.style.width = pct.toFixed(1) + '%';
-  if (label) label.textContent = done + ' / ' + total + ' заданий';
-}
-
-async function saveStateForChar(charNum) {
-  const suffix = charSuffix(charNum);
-  const arr = qa('.tasks-column input[type="checkbox"]').map(cb => !!cb.checked);
-  await fbSet(storageKey + suffix, arr);
-  await fbSet(vipStorageKey + suffix, !!vipCheckbox.checked);
-  await fbSet(x2StorageKey + suffix, !!x2Checkbox.checked);
-  const cbOnlineEl = document.getElementById('cbOnline');
-  if (cbOnlineEl) await fbSet(storageKey + suffix + '_online', cbOnlineEl.checked);
-}
-
-function q(sel){return document.querySelector(sel);}
-function qa(sel){return Array.from(document.querySelectorAll(sel));}
-
-let checkboxes = qa('.tasks-column input[type="checkbox"]');
-let N = checkboxes.length;
-const vipCheckbox = q('#vipCheckbox');
-const x2Checkbox = q('#x2Checkbox');
-
-function getPairFromRewardCell(cell) {
-  const without = parseInt(cell.getAttribute('data-without') || '0', 10);
-  const withv = parseInt(cell.getAttribute('data-with') || without.toString(), 10);
-  return {a: without, b: withv};
-}
-function updateRewardCellsDisplay(showVip, x2) {
-  const rewardCells = qa('.tasks-column td.reward');
-  rewardCells.forEach(cell => {
-    const {a,b} = getPairFromRewardCell(cell);
-    let base = showVip ? b : a;
-    if (showVip && b === a) base = a * 2;
-    const displayVal = base * (x2 ? 2 : 1);
-    cell.textContent = displayVal + ' BP';
-  });
-  document.body.classList.toggle('vip-mode', !!showVip);
-  document.body.classList.toggle('x2-mode', !!x2);
-  const onlineBase = 2;
-  const onlineBaseVip = vipCheckbox.checked ? onlineBase * 2 : onlineBase;
-  const onlineVal = onlineBaseVip * (x2Checkbox.checked ? 2 : 1);
-  const onlineElem = q('#onlineBp');
-  if (onlineElem) onlineElem.textContent = onlineVal + ' BP';
-}
-function computeTotals(showVip, x2) {
-  let sumSelectedTasks = 0;
-  let possibleTotalTasks = 0;
-  const rows = qa('.tasks-column tr');
-  rows.forEach(row => {
-    const rewardCell = row.querySelector('td.reward');
-    if (!rewardCell) return;
-    const {a,b} = getPairFromRewardCell(rewardCell);
-    let val = (showVip ? b : a);
-    if (showVip && b === a) val = a * 2;
-    val = val * (x2 ? 2 : 1);
-    const cb = row.querySelector('input[type="checkbox"]');
-    if (cb && cb.checked) sumSelectedTasks += val;
-    possibleTotalTasks += val;
-  });
-  const onlineBase = 2;
-  const onlineVal = (showVip ? onlineBase * 2 : onlineBase) * (x2 ? 2 : 1);
-  const cbOnlineEl = q('#cbOnline');
-  if (cbOnlineEl && cbOnlineEl.checked) sumSelectedTasks += onlineVal;
-  possibleTotalTasks += onlineVal;
-  const totalDisplayVal = sumSelectedTasks;
-  const remaining = Math.max(0, possibleTotalTasks - sumSelectedTasks);
-  return {totalDisplayVal, remaining};
-}
-function refreshAll() {
-  checkboxes = qa('.tasks-column input[type="checkbox"]');
-  N = checkboxes.length;
-  updateRewardCellsDisplay(!!vipCheckbox.checked, !!x2Checkbox.checked);
-  const {totalDisplayVal, remaining} = computeTotals(!!vipCheckbox.checked, !!x2Checkbox.checked);
-  q('#totalDisplay').textContent = totalDisplayVal;
-  q('#remainingDisplay').textContent = remaining;
-  qa('.tasks-column tr').forEach(row => {
-    const cb = row.querySelector('input[type="checkbox"]');
-    if (cb && cb.checked) row.classList.add('done'); else row.classList.remove('done');
-  });
-  if (typeof checkColumnCompletion === 'function') checkColumnCompletion();
-  if (typeof updateTaskProgressBar === 'function') updateTaskProgressBar();
-}
-async function loadState() {
-  if (!window._farmDBReady || !window._farmUID) return;
-  const raw = await fbGet(getStorageKey());
-  let arr = Array.isArray(raw) ? raw : new Array(N).fill(false);
-  if (arr.length !== N) arr = new Array(N).fill(false);
-  checkboxes = qa('.tasks-column input[type="checkbox"]');
-  N = checkboxes.length;
-  for (let i = 0; i < N; i++) { const cb = checkboxes[i]; if (cb) cb.checked = !!arr[i]; }
-  const vipMode = !!(await fbGet(getVipStorageKey()));
-  const x2Mode = !!(await fbGet(getX2StorageKey()));
-  vipCheckbox.checked = vipMode;
-  x2Checkbox.checked = x2Mode;
-  const cbOnlineEl = document.getElementById('cbOnline');
-  if (cbOnlineEl) {
-    const onlineVal = await fbGet(getStorageKey() + '_online');
-    cbOnlineEl.checked = onlineVal === true;
-    const bubble = document.getElementById('onlineBubble');
-    if (bubble) bubble.classList.toggle('done', cbOnlineEl.checked);
-  }
-  refreshAll();
-  updateCharUI();
-}
-async function saveState() {
-  if (!window._farmDBReady || !window._farmUID) return;
-  const arr = qa('.tasks-column input[type="checkbox"]').map(cb => !!cb.checked);
-  await fbSet(getStorageKey(), arr);
-  await fbSet(getVipStorageKey(), !!vipCheckbox.checked);
-  await fbSet(getX2StorageKey(), !!x2Checkbox.checked);
-  const cbOnlineEl = document.getElementById('cbOnline');
-  if (cbOnlineEl) await fbSet(getStorageKey() + '_online', cbOnlineEl.checked);
-  refreshAll();
-}
-function attachCheckboxListeners(){
-  qa('.tasks-column input[type="checkbox"]').forEach(cb => {
-    cb.removeEventListener('change', onCheckChange);
-    cb.addEventListener('change', onCheckChange);
-  });
-}
-function onCheckChange(e){
-  const cb = e.target;
-  const row = cb.closest('tr');
-  if (row) row.classList.toggle('done', cb.checked);
-  saveState();
-}
-function attachRowClickListeners(){
-  qa('.tasks-column tr').forEach(row => {
-    row.removeEventListener('click', onRowClick);
-    row.addEventListener('click', onRowClick);
-  });
-}
-function onRowClick(e){
-  if (e.target.closest('input[type="checkbox"]')) return;
-  const row = e.currentTarget;
-  const cb = row.querySelector('input[type="checkbox"]');
-  if (!cb) return;
-  cb.checked = !cb.checked;
-  cb.dispatchEvent(new Event('change', { bubbles: true }));
-}
-attachCheckboxListeners();
-attachRowClickListeners();
-vipCheckbox.addEventListener('change', () => saveState());
-x2Checkbox.addEventListener('change', () => saveState());
-document.getElementById('resetBtn').addEventListener('click', () => {
-  qa('.tasks-column input[type="checkbox"]').forEach(cb => cb.checked = false);
-  const bubble = document.getElementById('onlineBubble');
-  if (bubble) bubble.classList.remove('done');
-  const cbOnlineEl = document.getElementById('cbOnline');
-  if (cbOnlineEl) cbOnlineEl.checked = false;
-  saveState();
-});
-
-// Expose loadState globally so auth callback can call it after login
-window._farmLoadState = loadState;
-
-// Try loading if already authenticated (page reload case)
-loadState();
-</script>
 
 function updateCharUI() {
   document.getElementById('charBtn1').classList.toggle('active', currentChar === 1);
@@ -2172,65 +2131,309 @@ updateGridCols();
   100% { box-shadow: 0 0 8px rgba(57,255,100,1); opacity: 1; }
 }
 body.char2-active .date-online { color: rgba(100, 255, 140, 0.55); }
+
+/* Онлайн-счётчик — интерактивный */
+.date-online {
+  position: relative;
+  cursor: default;
+  pointer-events: auto !important;
+}
+.date-online:hover {
+  color: rgba(130, 255, 170, 0.85);
+}
+
+/* Попап с никами */
+.online-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 160px;
+  max-width: 260px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(8, 16, 28, 0.94);
+  backdrop-filter: blur(18px) saturate(0.7);
+  -webkit-backdrop-filter: blur(18px) saturate(0.7);
+  border: 1px solid rgba(80, 255, 130, 0.18);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.55),
+    0 0 0 1px rgba(60,255,110,0.08) inset,
+    0 0 24px rgba(57,255,100,0.06);
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, visibility 0.18s ease, transform 0.18s ease;
+  transform: translateX(-50%) translateY(4px);
+  white-space: nowrap;
+}
+.date-online:hover .online-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+.online-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(8,16,28,0.94);
+}
+.online-tooltip-title {
+  font-family: monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(80, 255, 130, 0.45);
+  margin-bottom: 8px;
+  text-align: center;
+}
+.online-tooltip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.online-tooltip-nick {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(200, 255, 220, 0.88);
+}
+.online-tooltip-nick::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(57, 255, 100, 0.85);
+  box-shadow: 0 0 6px rgba(57,255,100,0.9);
+  flex-shrink: 0;
+  animation: dotPulse 2s ease-in-out infinite alternate;
+}
+.online-tooltip-empty {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: rgba(150,180,160,0.45);
+  letter-spacing: 2px;
+  text-align: center;
+}
 </style>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, onValue, set, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue, set, remove, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCMVd8slq6gc6lD1noTW0DDW8VkALJcZao",
-    authDomain: "bonuspoint-lime.firebaseapp.com",
-    databaseURL: "https://bonuspoint-lime-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "bonuspoint-lime",
-    storageBucket: "bonuspoint-lime.firebasestorage.app",
-    messagingSenderId: "647315774952",
-    appId: "1:647315774952:web:b8269372e8abf5d97f185d"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-
-  const onlineRef = ref(db, 'online');
-
-  // Слушаем количество онлайн (запускаем сразу, не ждём IP)
-  onValue(onlineRef, (snapshot) => {
-    const count = snapshot.exists() ? Object.keys(snapshot.val()).length : 0;
-    const el = document.getElementById('onlineCount');
-    if (el) el.textContent = count;
-  });
-
-  // Получаем IP и регистрируем пользователя по нему
-  async function registerOnline() {
-    let clientKey;
-
-    try {
-      // Получаем реальный IP через публичный API
-      const res = await fetch('https://api.ipify.org?format=json');
-      const data = await res.json();
-      // Заменяем точки на дефисы (Firebase не любит точки в ключах)
-      clientKey = data.ip.replace(/\./g, '-').replace(/:/g, '-');
-    } catch (e) {
-      // Если не удалось получить IP — fallback на стабильный ID в localStorage
-      let storedId = localStorage.getItem('_farm_uid');
-      if (!storedId) {
-        storedId = Math.random().toString(36).slice(2) + Date.now().toString(36);
-        localStorage.setItem('_farm_uid', storedId);
-      }
-      clientKey = storedId;
-    }
-
-    const userRef = ref(db, `online/${clientKey}`);
-
-    // Записываем себя как онлайн
-    await set(userRef, { t: serverTimestamp() });
-
-    // При закрытии/уходе — удаляем себя
-    // (срабатывает когда все вкладки с этого IP закрыты)
-    onDisconnect(userRef).remove();
+  // Переиспользуем уже инициализированное приложение authApp
+  let app;
+  try { app = getApp("authApp"); } catch(e) {
+    app = initializeApp({
+      apiKey: "AIzaSyCMVd8slq6gc6lD1noTW0DDW8VkALJcZao",
+      authDomain: "bonuspoint-lime.firebaseapp.com",
+      databaseURL: "https://bonuspoint-lime-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "bonuspoint-lime",
+      storageBucket: "bonuspoint-lime.firebasestorage.app",
+      messagingSenderId: "647315774952",
+      appId: "1:647315774952:web:b8269372e8abf5d97f185d"
+    }, "authApp");
   }
 
-  registerOnline();
+  const db = getDatabase(app);
+  const auth = getAuth(app);
+  const onlineRef = ref(db, 'online');
+
+  function getNick(email) {
+    if (!email) return '???';
+    return email.split('@')[0].toUpperCase();
+  }
+
+  function updateTooltip(snapshot) {
+    const listEl = document.getElementById('onlineNickList');
+    const countEl = document.getElementById('onlineCount');
+    if (!listEl || !countEl) return;
+
+    if (!snapshot.exists()) {
+      countEl.textContent = '0';
+      listEl.innerHTML = '<div class="online-tooltip-empty">никого нет</div>';
+      return;
+    }
+
+    const data = snapshot.val();
+    const entries = Object.values(data);
+    const count = entries.length;
+    countEl.textContent = count;
+
+    if (count === 0) {
+      listEl.innerHTML = '<div class="online-tooltip-empty">никого нет</div>';
+      return;
+    }
+
+    listEl.innerHTML = entries
+      .map(e => `<div class="online-tooltip-nick">${e.nick || '???'}</div>`)
+      .join('');
+  }
+
+  // Слушаем онлайн в реальном времени
+  onValue(onlineRef, (snapshot) => {
+    updateTooltip(snapshot);
+  });
+
+  // Регистрируем себя по UID (уникальный пользователь, не устройство)
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) return;
+    const uid = user.uid;
+    const nick = getNick(user.email);
+    const userRef = ref(db, `online/${uid}`);
+
+    await set(userRef, { nick, t: serverTimestamp() });
+    onDisconnect(userRef).remove();
+  });
+</script>
+
+<!-- ── Уведомление о новой версии ── -->
+<style>
+.update-toast {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px 14px 16px;
+  border-radius: 16px;
+  background: rgba(8, 16, 28, 0.96);
+  backdrop-filter: blur(20px) saturate(0.8);
+  -webkit-backdrop-filter: blur(20px) saturate(0.8);
+  border: 1px solid rgba(0, 220, 255, 0.3);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.6),
+    0 0 0 1px rgba(0,200,255,0.07) inset,
+    0 0 30px rgba(0,180,255,0.08);
+  transform: translateY(120px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), opacity 0.4s ease;
+  max-width: 320px;
+}
+.update-toast.visible {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+.update-toast-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  animation: updateIconPulse 2s ease-in-out infinite alternate;
+}
+@keyframes updateIconPulse {
+  0%   { filter: drop-shadow(0 0 4px rgba(0,220,255,0.5)); }
+  100% { filter: drop-shadow(0 0 12px rgba(0,220,255,0.9)); }
+}
+.update-toast-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+.update-toast-title {
+  font-family: monospace;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #00eeff, #7df0ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 6px rgba(0,220,255,0.5));
+  white-space: nowrap;
+}
+.update-toast-sub {
+  font-family: monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: rgba(150,200,230,0.5);
+  text-transform: uppercase;
+}
+.update-toast-btn {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: 30px;
+  border: 1.5px solid rgba(0,220,255,0.5);
+  background: linear-gradient(135deg, rgba(0,220,255,0.15), rgba(0,150,255,0.10));
+  color: #7df0ff;
+  font-family: monospace;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  box-shadow: 0 0 8px rgba(0,200,255,0.15);
+}
+.update-toast-btn:hover {
+  background: linear-gradient(135deg, rgba(0,220,255,0.28), rgba(0,150,255,0.20));
+  border-color: #00eeff;
+  box-shadow: 0 0 18px rgba(0,220,255,0.4);
+  transform: scale(1.05);
+}
+.update-toast-btn:active {
+  transform: scale(0.97);
+}
+</style>
+
+<div class="update-toast" id="updateToast">
+  <div class="update-toast-icon">⚡</div>
+  <div class="update-toast-body">
+    <div class="update-toast-title">Новая версия</div>
+    <div class="update-toast-sub">Доступно обновление сайта</div>
+  </div>
+  <button class="update-toast-btn" id="updateReloadBtn">Перезапустить</button>
+</div>
+
+<script type="module">
+  import { getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const app = getApp("authApp");
+  const db = getDatabase(app);
+
+  // Версия, зашитая в этой сборке сайта
+  const CURRENT_VERSION = "1";
+
+  const versionRef = ref(db, 'config/version');
+  const toast = document.getElementById('updateToast');
+  const reloadBtn = document.getElementById('updateReloadBtn');
+
+  let initialized = false;
+
+  onValue(versionRef, (snapshot) => {
+    const remoteVersion = snapshot.exists() ? String(snapshot.val()) : null;
+    if (!initialized) {
+      // Первый вызов — просто запоминаем, не показываем тост
+      initialized = true;
+      return;
+    }
+    if (remoteVersion && remoteVersion !== CURRENT_VERSION) {
+      toast.classList.add('visible');
+    }
+  });
+
+  reloadBtn.addEventListener('click', () => {
+    location.reload(true);
+  });
 </script>
 </body>
 </html>
