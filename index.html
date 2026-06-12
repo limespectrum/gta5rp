@@ -2296,6 +2296,24 @@ body.char2-active .date-online { color: rgba(100, 255, 140, 0.55); }
     await set(userRef, { nick, t: serverTimestamp() });
     onDisconnect(userRef).remove();
   });
+
+  // ── Проверка версии сайта ──
+  const CURRENT_VERSION = "1";
+  const versionRef = ref(db, 'config/version');
+  const toast = document.getElementById('updateToast');
+  const reloadBtn = document.getElementById('updateReloadBtn');
+
+  onValue(versionRef, (snapshot) => {
+    if (!snapshot.exists()) return;
+    const remoteVersion = String(snapshot.val());
+    if (remoteVersion !== CURRENT_VERSION) {
+      toast.classList.add('visible');
+    }
+  });
+
+  reloadBtn.addEventListener('click', () => {
+    location.reload(true);
+  });
 </script>
 
 <!-- ── Уведомление о новой версии ── -->
@@ -2403,37 +2421,5 @@ body.char2-active .date-online { color: rgba(100, 255, 140, 0.55); }
   <button class="update-toast-btn" id="updateReloadBtn">Перезапустить</button>
 </div>
 
-<script type="module">
-  import { getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-  const app = getApp("authApp");
-  const db = getDatabase(app);
-
-  // Версия, зашитая в этой сборке сайта
-  const CURRENT_VERSION = "1";
-
-  const versionRef = ref(db, 'config/version');
-  const toast = document.getElementById('updateToast');
-  const reloadBtn = document.getElementById('updateReloadBtn');
-
-  let initialized = false;
-
-  onValue(versionRef, (snapshot) => {
-    const remoteVersion = snapshot.exists() ? String(snapshot.val()) : null;
-    if (!initialized) {
-      // Первый вызов — просто запоминаем, не показываем тост
-      initialized = true;
-      return;
-    }
-    if (remoteVersion && remoteVersion !== CURRENT_VERSION) {
-      toast.classList.add('visible');
-    }
-  });
-
-  reloadBtn.addEventListener('click', () => {
-    location.reload(true);
-  });
-</script>
 </body>
 </html>
