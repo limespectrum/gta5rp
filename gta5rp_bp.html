@@ -6993,12 +6993,8 @@ document.getElementById('resetConfirmApply').addEventListener('click', () => {
 
 (function(){
   const emojis = {'Downtown':'🌆','Strawberry':'🍓','Blackberry':'🍇','Insquad':'🎭','Sunrise':'🌅','Richman':'🤵','Eclipse':'🌘','Rockford':'💎','Mirror':'🪞','Chiliad':'🏔','Redwood':'🌲','Murrieta':'🌹','La Puerta':'🪇'};
-  const order = ['Downtown','Strawberry','Blackberry','Insquad','Sunrise','Richman','Eclipse','Rockford','Mirror','Chiliad','Redwood','Murrieta','La Puerta'];
-  // Номера (#) серверов фиксированы, чтобы не «поехали» после удаления закрытых.
-  // ⚠️ Номер Mirror (19) — предположение, при необходимости поправьте.
-  const serverIds = {'Downtown':1,'Strawberry':2,'Blackberry':4,'Insquad':5,'Sunrise':6,'Richman':7,'Eclipse':8,'Rockford':11,'Chiliad':13,'Redwood':14,'Murrieta':16,'La Puerta':18,'Mirror':19};
-  // Vinewood, La Mesa, Burton, Alta, Grapeseed, Milton закрыты и объединены в Mirror.
-  // Rainbow, Del Perro, Davis, Harmony, Hawick, Vespucci, Senora закрыты и объединены в Chiliad.
+  // Список серверов берётся прямо из API: закрытые пропадают сами, новые появляются сами.
+  // Эмодзи — необязательная «красота»: для сервера, которого нет в списке выше, будет показан '●'.
 
   // ── ОБЩИЙ КЭШ ОНЛАЙНА ЧЕРЕЗ FIREBASE (чтобы не грузить чужой API GTA5RP
   // отдельным запросом с каждого открытого браузера) ──
@@ -7074,12 +7070,24 @@ document.getElementById('resetConfirmApply').addEventListener('click', () => {
       const data = await getServersDataShared(force);
 
       let servers = [];
-      order.forEach((name) => {
-        const id = serverIds[name];
-        if (data[name]) {
-          servers.push({ id, name, emoji: emojis[name] || '●', online: data[name].online, max: data[name].max || 1000 });
-        }
+      // Все сервера из ответа API (кроме служебного ключа success).
+      // Онлайн 0 — это тоже значение, такой сервер показывается.
+      Object.keys(data).forEach((name) => {
+        const info = data[name];
+        if (name === 'success' || !info || typeof info.online !== 'number') return;
+        servers.push({ id: servers.length + 1, name, emoji: emojis[name] || '●', online: info.online, max: info.max || 1000 });
       });
+
+      // Снимаем пины с серверов, которых больше нет в API (закрыты/объединены).
+      if (servers.length) {
+        const live = new Set(servers.map(s => s.name));
+        const before = window._pinnedServers.length;
+        window._pinnedServers = window._pinnedServers.filter(p => live.has(p.name));
+        if (window._pinnedServers.length !== before) {
+          savePinnedServers();
+          renderPinnedWidgets();
+        }
+      }
 
       const total = servers.reduce((s, x) => s + x.online, 0);
       totalBadge.textContent = '👥 ВСЕГО ОНЛАЙН: ' + total.toLocaleString('ru-RU');
@@ -7219,12 +7227,8 @@ document.getElementById('resetConfirmApply').addEventListener('click', () => {
       const parsed = JSON.parse(raw);
       let list = Array.isArray(parsed) ? parsed.slice(0, MAX_PINS) : [];
 
-      // Убираем закреплённые сервера, которых больше нет (объединены в Mirror / Chiliad)
-      const validNames = new Set(order);
-      const before = list.length;
-      list = list.filter(p => validNames.has(p.name));
+      // Закреплённые сервера, которых уже нет в API, снимутся сами после первой загрузки онлайна (см. omLoad)
       window._pinnedServers = list;
-      if (list.length !== before) savePinnedServers(); // сразу перезаписываем localStorage/облако очищенным списком
 
       renderPinnedWidgets();
       if (window._pinnedServers.length) setTimeout(omLoad, 300);
