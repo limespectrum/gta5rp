@@ -7078,6 +7078,9 @@ document.getElementById('resetConfirmApply').addEventListener('click', () => {
         servers.push({ id: servers.length + 1, name, emoji: emojis[name] || '●', online: info.online, max: info.max || 1000 });
       });
 
+      // Сортировка по онлайну: от большего к меньшему
+      servers.sort((a, b) => b.online - a.online);
+
       // Снимаем пины с серверов, которых больше нет в API (закрыты/объединены).
       if (servers.length) {
         const live = new Set(servers.map(s => s.name));
@@ -7100,7 +7103,7 @@ document.getElementById('resetConfirmApply').addEventListener('click', () => {
           <div class="om-dot ${dotClass}"></div>
           <div class="om-row-sep"></div>
           <div class="om-server-info">
-            <div class="om-server-name">${s.emoji} ${s.name}<span class="om-server-num">#${s.id}</span>${isPinned ? '<span class="om-pin-badge">📌</span>' : ''}</div>
+            <div class="om-server-name">${s.emoji} ${s.name}${isPinned ? '<span class="om-pin-badge">📌</span>' : ''}</div>
           </div>
           <div class="om-server-online ${dotClass}">${s.online.toLocaleString('ru-RU')}</div>
         </div>`;
