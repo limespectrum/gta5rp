@@ -6999,9 +6999,6 @@ document.getElementById('resetConfirmApply').addEventListener('click', () => {
   const serverIds = {'Downtown':1,'Strawberry':2,'Blackberry':4,'Insquad':5,'Sunrise':6,'Richman':7,'Eclipse':8,'Rockford':11,'Chiliad':13,'Redwood':14,'Murrieta':16,'La Puerta':18,'Mirror':19};
   // Vinewood, La Mesa, Burton, Alta, Grapeseed, Milton закрыты и объединены в Mirror.
   // Rainbow, Del Perro, Davis, Harmony, Hawick, Vespucci, Senora закрыты и объединены в Chiliad.
-  // Mirror пока может отсутствовать в API GTA5RP — тогда показываем его с онлайном 0 (см. omLoad ниже).
-  // Как только API начнёт возвращать data.Mirror, реальные цифры подхватятся автоматически.
-  const MIRROR_FALLBACK_MAX = 3500;
 
   // ── ОБЩИЙ КЭШ ОНЛАЙНА ЧЕРЕЗ FIREBASE (чтобы не грузить чужой API GTA5RP
   // отдельным запросом с каждого открытого браузера) ──
@@ -7081,11 +7078,6 @@ document.getElementById('resetConfirmApply').addEventListener('click', () => {
         const id = serverIds[name];
         if (data[name]) {
           servers.push({ id, name, emoji: emojis[name] || '●', online: data[name].online, max: data[name].max || 1000 });
-        } else if (name === 'Mirror') {
-          // Mirror ещё не добавлен в API — показываем с онлайном 0.
-          // Как только API начнёт возвращать data.Mirror, сработает ветка
-          // выше и правка кода больше не потребуется.
-          servers.push({ id, name, emoji: emojis[name] || '●', online: 0, max: MIRROR_FALLBACK_MAX });
         }
       });
 
