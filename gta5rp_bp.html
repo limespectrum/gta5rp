@@ -6992,12 +6992,16 @@ document.getElementById('resetConfirmApply').addEventListener('click', () => {
   const omDb = getDatabase(_omApp);
 
 (function(){
-  const emojis = {'Downtown':'🌆','Strawberry':'🍓','Vinewood':'🏰','Blackberry':'🍇','Insquad':'🎭','Sunrise':'🌅','Richman':'🤵','Eclipse':'🌘','La Mesa':'🌵','Burton':'🏛','Rockford':'💎','Alta':'🍀','Chiliad':'🏔','Redwood':'🌲','Grapeseed':'🌱','Murrieta':'🌹','Milton':'🍸','La Puerta':'🪇'};
-  const order = ['Downtown','Strawberry','Vinewood','Blackberry','Insquad','Sunrise','Richman','Eclipse','La Mesa','Burton','Rockford','Alta','Chiliad','Redwood','Grapeseed','Murrieta','Milton','La Puerta'];
+  const emojis = {'Downtown':'🌆','Strawberry':'🍓','Blackberry':'🍇','Insquad':'🎭','Sunrise':'🌅','Richman':'🤵','Eclipse':'🌘','Rockford':'💎','Mirror':'🪞','Chiliad':'🏔','Redwood':'🌲','Murrieta':'🌹','La Puerta':'🪇'};
+  const order = ['Downtown','Strawberry','Blackberry','Insquad','Sunrise','Richman','Eclipse','Rockford','Mirror','Chiliad','Redwood','Murrieta','La Puerta'];
+  // Номера (#) серверов фиксированы, чтобы не «поехали» после удаления закрытых.
+  // ⚠️ Номер Mirror (19) — предположение, при необходимости поправьте.
+  const serverIds = {'Downtown':1,'Strawberry':2,'Blackberry':4,'Insquad':5,'Sunrise':6,'Richman':7,'Eclipse':8,'Rockford':11,'Chiliad':13,'Redwood':14,'Murrieta':16,'La Puerta':18,'Mirror':19};
+  // Vinewood, La Mesa, Burton, Alta, Grapeseed, Milton закрыты и объединены в Mirror.
   // Rainbow, Del Perro, Davis, Harmony, Hawick, Vespucci, Senora закрыты и объединены в Chiliad.
-  // Chiliad ещё не добавлен в API GTA5RP — пока показываем его с онлайном 0 (см. omLoad ниже).
-  // Как только API начнёт возвращать data.Chiliad, реальные цифры подхватятся автоматически.
-  const CHILIAD_FALLBACK_MAX = 3500;
+  // Mirror пока может отсутствовать в API GTA5RP — тогда показываем его с онлайном 0 (см. omLoad ниже).
+  // Как только API начнёт возвращать data.Mirror, реальные цифры подхватятся автоматически.
+  const MIRROR_FALLBACK_MAX = 3500;
 
   // ── ОБЩИЙ КЭШ ОНЛАЙНА ЧЕРЕЗ FIREBASE (чтобы не грузить чужой API GTA5RP
   // отдельным запросом с каждого открытого браузера) ──
@@ -7073,14 +7077,15 @@ document.getElementById('resetConfirmApply').addEventListener('click', () => {
       const data = await getServersDataShared(force);
 
       let servers = [];
-      order.forEach((name, i) => {
+      order.forEach((name) => {
+        const id = serverIds[name];
         if (data[name]) {
-          servers.push({ id: i+1, name, emoji: emojis[name] || '●', online: data[name].online, max: data[name].max || 1000 });
-        } else if (name === 'Chiliad') {
-          // Chiliad ещё не добавлен в API — показываем с онлайном 0.
-          // Как только API начнёт возвращать data.Chiliad, сработает ветка
+          servers.push({ id, name, emoji: emojis[name] || '●', online: data[name].online, max: data[name].max || 1000 });
+        } else if (name === 'Mirror') {
+          // Mirror ещё не добавлен в API — показываем с онлайном 0.
+          // Как только API начнёт возвращать data.Mirror, сработает ветка
           // выше и правка кода больше не потребуется.
-          servers.push({ id: i+1, name, emoji: emojis[name] || '●', online: 0, max: CHILIAD_FALLBACK_MAX });
+          servers.push({ id, name, emoji: emojis[name] || '●', online: 0, max: MIRROR_FALLBACK_MAX });
         }
       });
 
@@ -7222,7 +7227,7 @@ document.getElementById('resetConfirmApply').addEventListener('click', () => {
       const parsed = JSON.parse(raw);
       let list = Array.isArray(parsed) ? parsed.slice(0, MAX_PINS) : [];
 
-      // Убираем закреплённые сервера, которых больше нет (объединены в Chiliad)
+      // Убираем закреплённые сервера, которых больше нет (объединены в Mirror / Chiliad)
       const validNames = new Set(order);
       const before = list.length;
       list = list.filter(p => validNames.has(p.name));
